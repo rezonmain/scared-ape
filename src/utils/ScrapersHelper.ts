@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import config from "config";
 import { Scraper } from "../services/Scraper.js";
-import { Scraper as ScraperModel } from "../models/Scraper.js";
+import { IScraper } from "../models/Scraper.js";
 import { DB } from "../services/DB.js";
 
 export class ScrapersHelper {
@@ -33,7 +33,7 @@ export class ScrapersHelper {
     );
   }
 
-  static toKnownIdList(scrapers: ScraperModel[]): ScraperModel["knownId"][] {
+  static toKnownIdList(scrapers: IScraper[]): IScraper["knownId"][] {
     return scrapers.map((s) => s.knownId);
   }
 }

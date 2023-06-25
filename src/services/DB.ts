@@ -1,9 +1,10 @@
 import { AccessRequest } from "../models/AccessRequest.js";
 import { Json } from "../models/Json.js";
 import { Run } from "../models/Run.js";
-import { Scraper } from "../models/Scraper.js";
+import { IScraper } from "../models/Scraper.js";
 import { Screenshot } from "../models/Screenshot.js";
 import config from "config";
+import { User } from "../models/User.js";
 
 /**
  * The database service, this is the interface that all database services should implement.
@@ -34,12 +35,48 @@ export abstract class DB {
   abstract disconnect(): Promise<void>;
 
   /**
+   * Registers a scraper in the database.
+   * @param scraper
+   */
+  abstract registerScraper(scraper: IScraper): Promise<void>;
+
+  /**
+   * Registers multiple scrapers in the database.
+   * @param scrapers
+   */
+  abstract registerManyScrapers(scrapers: IScraper[]): Promise<void>;
+
+  /**
+   * Get a scraper by its knownId.
+   * @param knownId
+   */
+  abstract getScraperbyKnownId(
+    knownId: IScraper["knownId"]
+  ): Promise<IScraper | undefined>;
+
+  /**
+   * Gets all the registerd scrapers.
+   */
+  abstract getAllScrapers(): Promise<IScraper[]>;
+
+  /**
+   * Get active scrapers
+   */
+  abstract getActiveScrapers(): Promise<IScraper[]>;
+
+  /**
+   * Completly removes a scraper from the database.
+   * @param knownId
+   */
+  abstract retireScraper(knownId: IScraper["knownId"]): Promise<void>;
+
+  /**
    * Saves the serialized JSON formatted as the corresponding DTO to the database.
    * @param scraperKnownId
    * @param serializedJSON
    */
   abstract saveScrappedJSON(
-    scraperKnownId: Scraper["knownId"],
+    scraperKnownId: IScraper["knownId"],
     serializedJSON: Json["json"]
   ): Promise<void>;
 
@@ -47,7 +84,7 @@ export abstract class DB {
    * Get the latest serialized JSON from a scrape run, formatted as the corresponding DTO from the database.
    * @param scraperKnownId
    */
-  abstract getScrappedJSON(scraperKnownId: Scraper["knownId"]): Promise<Json>;
+  abstract getScrappedJSON(scraperKnownId: IScraper["knownId"]): Promise<Json>;
 
   /**
    * Get the serialized JSON from a scrape run, using its ID
@@ -67,7 +104,7 @@ export abstract class DB {
    * @param base64Image
    */
   abstract savePageScreenshot(
-    scraperKnownId: Scraper["knownId"],
+    scraperKnownId: IScraper["knownId"],
     base64Image: Screenshot["image"]
   ): Promise<void>;
 
@@ -76,7 +113,7 @@ export abstract class DB {
    * @param scraperKnownId
    */
   abstract getPageScreenshot(
-    scraperKnownId: Scraper["knownId"]
+    scraperKnownId: IScraper["knownId"]
   ): Promise<Screenshot>;
 
   /**
@@ -98,14 +135,26 @@ export abstract class DB {
    * @param scraperKnownId
    * @param runId
    */
-  abstract saveScrapeRun(scraperKnownId: Scraper["knownId"]): Promise<void>;
+  abstract saveScrapeRun(scraperKnownId: IScraper["knownId"]): Promise<void>;
 
   /**
    * Get the latest scrape run of the passed scraperKnownId.
    * @param scraperKnownId
    * @param runId
    */
-  abstract getScrapeRun(scraperKnownId: Scraper["knownId"]): Promise<Run>;
+  abstract getScrapeRun(scraperKnownId: IScraper["knownId"]): Promise<Run>;
+
+  /**
+   * Save a user to the database.
+   * @param user
+   */
+  abstract saveUser(user: User): Promise<void>;
+
+  /**
+   * Get one user by email
+   */
+
+  abstract getUser(email: User["email"]): Promise<User | undefined>;
 
   /**
    * Update the status of a scrape run.
@@ -114,7 +163,7 @@ export abstract class DB {
    * @param status
    */
   abstract updateScrapeRunStatus(
-    scraperKnownId: Scraper["knownId"],
+    scraperKnownId: IScraper["knownId"],
     runId: Run["id"],
     status: Run["status"]
   ): Promise<void>;

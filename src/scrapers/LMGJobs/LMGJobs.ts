@@ -1,12 +1,16 @@
+import { IScraper } from "../../models/Scraper.js";
 import { DB } from "../../services/DB.js";
-import { Scraper } from "../Scraper.js";
+import { Scraper } from "../../services/Scraper.js";
 import type { Browser, Page } from "puppeteer";
 
 /*
   Scrapes the list of jobs from the jobs page of the LMG website
 */
-export class LMGJobs implements Scraper {
-  constructor(database: DB) {}
+export class LMGJobs extends Scraper {
+  constructor(database: DB) {
+    super(database);
+  }
+
   protected url: string = "https://linusmediagroup.com/jobs";
   protected browser: Browser;
   protected page: Page;
