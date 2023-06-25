@@ -1,8 +1,9 @@
-import type { Browser, Page } from "puppeteer";
 /*
   This is the base class for all scrapers.
 */
 export abstract class Scraper {
-  protected browser: Browser;
-  protected page: Page;
+  abstract get name(): string;
+  abstract get ID(): string;
+  abstract get associatedWidgets(): string[];
+  abstract scrape(): Promise<void>;
 }
