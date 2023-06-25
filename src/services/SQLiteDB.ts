@@ -36,9 +36,9 @@ export class SQLiteDB extends DB {
         continue;
       }
       /* 
-          Run all SQL statements in the migration in a 
-          transaction to safeguard against partial migrations
-        */
+        Run all SQL statements in the migration in a 
+        transaction to safeguard against partial migrations
+      */
       try {
         this.db.transaction(() => {
           migration.content.forEach((sql) => {
