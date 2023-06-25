@@ -1,11 +1,5 @@
-import { SQLiteDB } from "./services/SQLiteDB.js";
-import { Seeder } from "./services/Seeder.js";
+import { ScaredApe } from "./ScaredApe.js";
 
-(async () => {
-  const db = new SQLiteDB();
-  await db.connect();
-  await db.migrate();
-  const seeder = new Seeder(db);
-  await seeder.seed();
-  await db.disconnect();
-})();
+const app = new ScaredApe();
+app.bootstrap();
+app.run();

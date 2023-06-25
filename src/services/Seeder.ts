@@ -16,7 +16,7 @@ export class Seeder {
     }
   }
 
-  async createPyro() {
+  private async createPyro() {
     const email = config.get<string>("pyro.email");
     const pyro = await this.db.getUser(email);
     if (pyro) {
@@ -26,7 +26,7 @@ export class Seeder {
     this.db.saveUser({ email, role: "pyro" });
   }
 
-  async registerScrapers() {
+  private async registerScrapers() {
     const registeredScrapers = await this.db.getAllScrapers();
     const scrapers = await ScrapersHelper.getAll();
     const idList = ScrapersHelper.toKnownIdList(registeredScrapers);
