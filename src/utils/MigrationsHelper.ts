@@ -15,8 +15,17 @@ export class MigrationsHelper {
     const promises = migrations.map(async (migration) => {
       const content = await fs.readFile(`${pathname}/${migration}`, "utf-8");
       const version = parseInt(migration.split("_")[0]);
-      return { name: migration, version, content: content.split(";") };
+      return {
+        name: migration,
+        version,
+        content: content
+          .replaceAll("\n", "")
+          .split(";")
+          .filter((s) => s)
+          .map((s) => s + ";"),
+      };
     });
-    return await Promise.all(promises);
+    const resolvedMigrations = await Promise.all(promises);
+    return resolvedMigrations.sort((a, b) => a.version - b.version);
   }
 }

@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS scraper (
   updatedAt DATETIME,
   knownId TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
-  associatedWidgets TEXT NOT NULL
+  associatedWidgets TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'inactive',
+  interval INTEGER NOT NULL DEFAULT 86400,
 );
 CREATE TABLE IF NOT EXISTS json (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +24,7 @@ CREATE TABLE IF NOT EXISTS json (
   runId INTEGER NOT NULL,
   json TEXT,
   cacheHash TEXT,
-  status TEXT NOT NULL DEFAULT 'pending',
+  status TEXT NOT NULL DEFAULT 'latest',
   FOREIGN KEY(scraperId) REFERENCES scraper(id),
   FOREIGN KEY(runId) REFERENCES run(id)
 );
@@ -59,3 +61,4 @@ CREATE TABLE IF NOT EXISTS token (
   expiresAt DATETIME NOT NULL,
   FOREIGN KEY(userId) REFERENCES user(id)
 );
+PRAGMA user_version = 1;

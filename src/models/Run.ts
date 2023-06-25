@@ -3,5 +3,5 @@ import { Entity } from "./Entity.js";
 
 export interface Run extends Entity {
   scraperId: number;
-  status: RunStatus;
+  status: RunStatus; // default "running"
 }

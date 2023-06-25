@@ -3,5 +3,5 @@ import { Entity } from "./Entity.js";
 
 export interface User extends Entity {
   email: string;
-  role: UserRole;
+  role: UserRole; // default "scout"
 }

@@ -1,3 +1,4 @@
+import c from "config";
 import { AccessRequest } from "../models/AccessRequest.js";
 import { Json } from "../models/Json.js";
 import { Run } from "../models/Run.js";
@@ -5,36 +6,62 @@ import { Scraper } from "../models/Scraper.js";
 import { Screenshot } from "../models/Screenshot.js";
 import { MigrationsHelper } from "../utils/MigrationsHelper.js";
 import { DB } from "./DB.js";
-import sqlite3 from "sqlite3";
+import Database from "better-sqlite3";
 
 export class SQLiteDB extends DB {
-  private db: sqlite3.Database;
+  private db: Database.Database;
 
   constructor() {
     super();
   }
 
   async connect(): Promise<void> {
-    this.db = new sqlite3.Database(`./${this.name}.sqlite`, (err) => {
-      if (err) {
-        console.error(err.message);
-      }
-      console.log("Succesfully connected to the scared-ape database.");
-    });
+    try {
+      this.db = new Database(`./${this.name}.sqlite`);
+      console.log(`✅ Connected to the ${this.name} database`);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async migrate(): Promise<void> {
     const migrations = await MigrationsHelper.getAll();
-    console.log(JSON.stringify(migrations, null, 2));
+    const currentVersion = await this.getMigrationVersion();
+    try {
+      // Loop over all migrations
+      for (const migration of migrations) {
+        // If the migration version is less than or equal to the current version, skip it
+        if (migration.version <= currentVersion) {
+          console.log(
+            `⏭️ Skipping migration: ${migration.name} version: ${migration.version}`
+          );
+          continue;
+        }
+        // Run all SQL statements in the migration
+        migration.content.forEach((sql) => {
+          this.db.prepare(sql).run();
+        });
+        console.log(
+          `✅ OK Migration: ${migration.name}, version: ${migration.version}`
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    console.log("✅ Successfully ran all migrations");
   }
 
   async disconnect(): Promise<void> {
-    this.db.close((err) => {
-      if (err) {
-        console.error(err.message);
-      }
-      console.log("Closed the database connection.");
-    });
+    try {
+      this.db.close();
+      console.log(`✅ Disconnected from the ${this.name} database`);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getMigrationVersion(): Promise<number> {
+    return this.db.pragma("user_version", { simple: true }) as number;
   }
 
   saveScrappedJSON(

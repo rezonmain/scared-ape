@@ -6,5 +6,5 @@ export interface Json extends Entity {
   runId: number;
   json: string;
   cacheHash: string;
-  status: JsonStatus;
+  status: JsonStatus; // default "latest"
 }

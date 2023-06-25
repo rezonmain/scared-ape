@@ -24,6 +24,11 @@ export abstract class DB {
   abstract migrate(): Promise<void>;
 
   /**
+   * Gets the current migration version of the database.
+   */
+  abstract getMigrationVersion(): Promise<number>;
+
+  /**
    * Disconnects from the database.
    */
   abstract disconnect(): Promise<void>;
