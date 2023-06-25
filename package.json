@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "runs": "node dist/index.js"
+    "run:dev": "NODE_ENV=dev node dist/index.js"
   },
   "keywords": [],
   "author": "rezonmain",

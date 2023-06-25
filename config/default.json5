@@ -5,4 +5,10 @@
       path: "./src/migrations/",
     },
   },
+  scrapers: {
+    path: "./src/scrapers",
+  },
+  pyro: {
+    email: "",
+  },
 }
