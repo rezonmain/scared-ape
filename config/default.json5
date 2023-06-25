@@ -1,0 +1,8 @@
+{
+  database: {
+    name: "scared-ape",
+    migrations: {
+      path: "./src/migrations/",
+    },
+  },
+}

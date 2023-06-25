@@ -3,78 +3,25 @@ import { Json } from "../models/Json.js";
 import { Run } from "../models/Run.js";
 import { Scraper } from "../models/Scraper.js";
 import { Screenshot } from "../models/Screenshot.js";
+import config from "config";
 
 /**
-```DBML
-Table run {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  scraperId integer
-  status varchar [not null] #default: 'running'
-}
-
-Table scraper {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  knownId varchar [not null, unique]
-  name varchar [not null]
-  associatedWidgets varchar [not null]
-}
-
-Table json {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  scraperId integer
-  runId integer
-  json varchar
-  cacheHash varchar
-  status varchar [not null] #default: 'latest'
-}
-
-Table user {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  email varchar [not null, unique]
-  role varchar [not null] #default: 'scout'
-}
-
-Table screenshot {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  scraperId integer
-  runId integer
-  image varchar
-}
-
-Table access_request {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  email varchar [not null unique]
-  whitelisted integer [not null] #default: 0
-}
-
-Table token {
-  id integer [primary key]
-  createdAt timestamp [not null]
-  updatedAt timestamp [not null]
-  userId integer
-  token varchar [not null]
-  expiresAt timestamp [not null]
-}
-```
-*/
-
+ * The database service, this is the interface that all database services should implement.
+ */
 export abstract class DB {
+  readonly name: string;
+  constructor() {
+    this.name = config.get("database.name");
+  }
   /**
    * Connects to the database.
    */
   abstract connect(): Promise<void>;
+
+  /**
+   * Migrates the database to the latest version.
+   */
+  abstract migrate(): Promise<void>;
 
   /**
    * Disconnects from the database.
@@ -189,3 +136,76 @@ export abstract class DB {
    */
   abstract deleteAccessRequest(email: AccessRequest["email"]): Promise<void>;
 }
+
+/**
+ * v1
+```DBML
+Table run {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  scraperId integer
+  status text [not null, default: 'running']
+}
+
+Table scraper {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  knownId text [not null, unique]
+  name text [not null]
+  associatedWidgets text [not null]
+}
+
+Table json {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  scraperId integer
+  runId integer
+  json text
+  cacheHash text
+  status text [not null, default: 'latest']
+}
+
+Table user {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  email text [not null, unique]
+  role text [not null, default: 'scout']
+}
+
+Table screenshot {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  scraperId integer
+  runId integer
+  image text
+}
+
+Table access_request {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  email text [not null, unique]
+  whitelisted integer [not null, default: 0]
+}
+
+Table token {
+  id integer [primary key]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  userId integer
+  token text [not null]
+  expiresAt timestamp [not null]
+}
+
+Ref: run.scraperId > scraper.id
+Ref: json.scraperId > scraper.id
+Ref: screenshot.scraperId > scraper.id
+Ref: screenshot.runId > run.id
+Ref: token.userId > user.id
+```
+*/
