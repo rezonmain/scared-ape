@@ -96,13 +96,14 @@ export class SQLiteDB extends DB {
 
   async registerManyScrapers(scrapers: IScraper[]): Promise<void> {
     const query =
-      "INSERT INTO scraper (knownId, name, associatedWidgets) VALUES (?, ?, ?)";
+      "INSERT INTO scraper (name, status, knownId, associatedWidgets) VALUES (?, ?, ?, ?)";
     const stmt = this.db.prepare(query);
     const insertMany = this.db.transaction(() => {
       scrapers.forEach((scraper) => {
         stmt.run(
-          scraper.knownId,
           scraper.name,
+          scraper.status,
+          scraper.knownId,
           scraper.associatedWidgets.join(",")
         );
         Logger.log(

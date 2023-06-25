@@ -1,9 +1,12 @@
+import { Browser } from "puppeteer";
 import { DB } from "./services/DB.js";
 import { SQLiteDB } from "./services/SQLiteDB.js";
 import { Seeder } from "./services/Seeder.js";
 
 export class ScaredApe {
   private db: DB;
+  private api;
+  private scheduler;
   constructor() {
     this.db = new SQLiteDB();
   }

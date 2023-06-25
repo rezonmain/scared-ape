@@ -1,4 +1,3 @@
-import { IScraper } from "../../models/Scraper.js";
 import { DB } from "../../services/DB.js";
 import { Scraper } from "../../services/Scraper.js";
 import type { Browser, Page } from "puppeteer";

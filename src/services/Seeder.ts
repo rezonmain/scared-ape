@@ -2,6 +2,7 @@ import config from "config";
 import { DB } from "./DB.js";
 import { ScrapersHelper } from "../utils/ScrapersHelper.js";
 import { Logger } from "../utils/Logger.js";
+import { ScraperStatus } from "../constants/scraperStatus.js";
 
 export class Seeder {
   constructor(private db: DB) {}
@@ -30,9 +31,10 @@ export class Seeder {
     const registeredScrapers = await this.db.getAllScrapers();
     const scrapers = await ScrapersHelper.getAll();
     const idList = ScrapersHelper.toKnownIdList(registeredScrapers);
+    const status = config.get<ScraperStatus>("scrapers.initialStatus");
     const missingScrapers = scrapers
       .filter((s) => !idList.includes(s.knownId))
-      .map((s) => s.model);
+      .map((s) => ({ ...s.model, status }));
 
     if (missingScrapers.length <= 0) return;
     Logger.log(
