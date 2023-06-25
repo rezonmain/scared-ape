@@ -1,4 +1,3 @@
-import c from "config";
 import { AccessRequest } from "../models/AccessRequest.js";
 import { Json } from "../models/Json.js";
 import { Run } from "../models/Run.js";
@@ -27,26 +26,36 @@ export class SQLiteDB extends DB {
   async migrate(): Promise<void> {
     const migrations = await MigrationsHelper.getAll();
     const currentVersion = await this.getMigrationVersion();
-    try {
-      // Loop over all migrations
-      for (const migration of migrations) {
-        // If the migration version is less than or equal to the current version, skip it
-        if (migration.version <= currentVersion) {
-          console.log(
-            `⏭️ Skipping migration: ${migration.name} version: ${migration.version}`
-          );
-          continue;
-        }
-        // Run all SQL statements in the migration
-        migration.content.forEach((sql) => {
-          this.db.prepare(sql).run();
-        });
+    // Loop over all migrations
+    for (const migration of migrations) {
+      // If the migration version is less than or equal to the current version, skip it
+      if (migration.version <= currentVersion) {
         console.log(
-          `✅ OK Migration: ${migration.name}, version: ${migration.version}`
+          `⏭️ Skipping migration: ${migration.name} version: ${migration.version}`
         );
+        continue;
       }
-    } catch (error) {
-      console.error(error);
+      /* 
+          Run all SQL statements in the migration in a 
+          transaction to safeguard against partial migrations
+        */
+      try {
+        this.db.transaction(() => {
+          migration.content.forEach((sql) => {
+            this.db.prepare(sql).run();
+          });
+        })();
+      } catch (error) {
+        console.error(
+          `Error running migration ${migration.name} rolling back transaction...`,
+          "\n",
+          error
+        );
+        throw error;
+      }
+      console.log(
+        `✅ OK Migration: ${migration.name}, version: ${migration.version}`
+      );
     }
     console.log("✅ Successfully ran all migrations");
   }
