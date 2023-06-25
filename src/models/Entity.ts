@@ -1,5 +1,5 @@
 export interface Entity {
-  id: number;
-  createdAt: Date;
-  updatedAt: Date;
+  readonly id?: number;
+  readonly createdAt?: Date;
+  readonly updatedAt?: Date;
 }
