@@ -1,7 +1,7 @@
 import { ToadScheduler, SimpleIntervalJob, AsyncTask } from "toad-scheduler";
-import { Logger } from "../utils/Logger.js";
-import { DB } from "./db/DB.js";
-import { ScrapersHelper } from "../utils/ScrapersHelper.js";
+import { Logger } from "../../utils/Logger.js";
+import { DB } from "../db/DB.js";
+import { ScrapersHelper } from "../../utils/ScrapersHelper.js";
 
 export class Scheduler {
   private toadScheduler: ToadScheduler;
