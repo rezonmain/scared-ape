@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { object, z } from "zod";
 import { Run } from "../models/Run.js";
 import { IScraper } from "../models/Scraper.js";
 import { DB } from "./db/DB.js";
@@ -8,7 +8,7 @@ import { Logger } from "../utils/Logger.js";
 /*
   This is the base class for all scrapers.
 */
-export abstract class Scraper<Dto> {
+export abstract class Scraper<Dto = void> {
   protected db: DB;
   protected runId: Run["id"];
   protected url: string;
@@ -19,9 +19,16 @@ export abstract class Scraper<Dto> {
   abstract get name(): string;
   abstract get knownId(): string;
   abstract get associatedWidgets(): string[];
+  /**
+   * Create a run entry in the database and saves the runId
+   */
   protected async saveRun(): Promise<void> {
     this.runId = await this.db.saveRun(this.knownId);
   }
+  /**
+   * Validates and saves the Json data from the scraping run to the database
+   * @param data
+   */
   protected async saveJson(data: Dto | Dto[]): Promise<void> {
     const parsedData = this.validateJson(data);
     const latestHash = await this.db.getLatestJsonHash(this.knownId);
@@ -70,6 +77,10 @@ export abstract class Scraper<Dto> {
       throw error;
     }
   }
+  /**
+   * Scrapes the data from the website and saves it to the database
+   * @param data
+   */
   abstract scrape(): Promise<void>;
   get model(): IScraper {
     return {

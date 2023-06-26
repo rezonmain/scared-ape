@@ -7,8 +7,6 @@ import { Logger } from "../../utils/Logger.js";
 /*
   Scrapes the list of jobs from the jobs page of the LMG website
 */
-
-// TODO: some of the logic can be moved to the base class
 export class LMGJobs extends Scraper<LMGJobsDTO> {
   constructor(database: DB) {
     super(database);

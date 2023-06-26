@@ -20,7 +20,7 @@ export class ScrapersHelper {
   static async getScraperInstance(
     scraperName: string,
     db?: DB
-  ): Promise<Scraper<void>> {
+  ): Promise<Scraper> {
     try {
       const scraper = await import(
         `../scrapers/${scraperName}/${scraperName}.js`
@@ -31,7 +31,7 @@ export class ScrapersHelper {
     }
   }
 
-  static async getAll(): Promise<Scraper<void>[]> {
+  static async getAll(): Promise<Scraper[]> {
     return await Promise.all(
       (
         await this.list()
