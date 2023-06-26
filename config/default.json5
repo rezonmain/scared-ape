@@ -12,7 +12,7 @@
     email: "",
   },
   api: {
-    port: 3000,
+    port: 7363,
   },
   app: {
     bootstrapOnStartup: true,

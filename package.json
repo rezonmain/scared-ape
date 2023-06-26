@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "tsc && node dist/index.js",
     "build": "tsc",
     "bs": "pnpm build:swc && node dist/cli/bootstrap.js",
     "dev": "pnpm build:swc && (pnpm watch:swc & NODE_ENV=dev nodemon dist/index.js)",
@@ -13,6 +13,7 @@
     "dev:noWatch": "NODE=dev node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
+    "clean": "rm -rf dist",
     "lint:fix": "eslint . --ext .ts --fix",
     "build:swc": "swc src -d dist",
     "watch:swc": "swc src -d dist -w"
