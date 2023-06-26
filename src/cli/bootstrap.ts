@@ -5,12 +5,11 @@ import { Logger } from "../utils/Logger.js";
   try {
     Logger.log("🔄 [👾cli/bootstrap] bootstrapping scared-ape...");
     const app = new ScaredApe();
-    app.bootstrap();
+    await app.bootstrap();
     Logger.log("✅ [👾cli/bootstrap] successfully bootrsrapped scared-ape...");
   } catch (error) {
-    Logger.error(
+    Logger.logAndExit(
       `❌ [👾cli/bootstrap] something went wrong while bootstrapping, ${error}`
     );
-    process.exit(1);
   }
 })();
