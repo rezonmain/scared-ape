@@ -31,10 +31,9 @@ export class Seeder {
     const registeredScrapers = await this.db.getAllScrapers();
     const scrapers = await ScrapersHelper.getAll();
     const idList = ScrapersHelper.toKnownIdList(registeredScrapers);
-    const status = config.get<ScraperStatus>("scrapers.initialStatus");
     const missingScrapers = scrapers
       .filter((s) => !idList.includes(s.knownId))
-      .map((s) => ({ ...s.model, status }));
+      .map((s) => ({ ...s.model }));
 
     if (missingScrapers.length <= 0) return;
     Logger.log(

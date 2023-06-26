@@ -7,7 +7,6 @@
   },
   scrapers: {
     path: "./src/scrapers",
-    initialStatus: "active",
   },
   pyro: {
     email: "",

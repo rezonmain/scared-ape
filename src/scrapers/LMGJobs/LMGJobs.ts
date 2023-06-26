@@ -13,6 +13,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
     this.url = "https://linusmediagroup.com/jobs";
     this.dtoValidator = LMGJobsDTOSchema;
     this.shouldNotifyChanges = true;
+    this.status = "active";
   }
 
   get name(): string {
@@ -31,6 +32,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
     Logger.log(`🔄 [${this.name}] scraping...`);
     this.saveRun();
     let listings: LMGJobsDTO[] = [];
+    let screenshot: Buffer;
     try {
       const browser = await puppeteer.launch({ headless: "new" });
       const page = await browser.newPage();
@@ -38,6 +40,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
 
       // Wait for the jobs list to load
       await page.waitForSelector(".accordion-items-container");
+      screenshot = await page.screenshot();
 
       // Get the jobs list <ul> element
       const jobsUl = await page.$(".accordion-items-container");
@@ -86,6 +89,6 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
       await this.db.updateRunStatus(this.runId, "failure");
       throw error;
     }
-    await this.saveJson(listings);
+    this.saveScrapedData(listings, screenshot);
   }
 }

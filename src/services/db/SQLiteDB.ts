@@ -250,11 +250,22 @@ export class SQLiteDB extends DB {
     throw new Error("Method not implemented");
   }
 
-  saveScreenshot(
+  async saveScreenshot(
+    runId: Run["id"],
     scraperKnownId: IScraper["knownId"],
     base64Image: Screenshot["image"]
   ): Promise<void> {
-    throw new Error("Method not implemented");
+    const query =
+      "INSERT INTO screenshot (runId, scraperId, image) VALUES (?, ?, ?)";
+    try {
+      const scraper = await this.getScraperbyKnownId(scraperKnownId);
+      this.db.prepare(query).run(runId, scraper.id, base64Image);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][saveScreenshot()] Query -> ${query} with ${scraper.id}, -`
+      );
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 
   getLatestScreenshot(

@@ -120,6 +120,7 @@ export abstract class DB {
    * @param base64Image
    */
   abstract saveScreenshot(
+    runId: Run["id"],
     scraperKnownId: IScraper["knownId"],
     base64Image: Screenshot["image"]
   ): Promise<void>;

@@ -4,6 +4,7 @@ import { IScraper } from "../models/Scraper.js";
 import { DB } from "./db/DB.js";
 import { CacheHelper } from "../utils/CacheHelper.js";
 import { Logger } from "../utils/Logger.js";
+import { ScraperStatus } from "../constants/scraperStatus.js";
 
 /*
   This is the base class for all scrapers.
@@ -14,6 +15,7 @@ export abstract class Scraper<Dto = void> {
   protected url: string;
   protected dtoValidator: z.ZodSchema<Dto>;
   protected shouldNotifyChanges: boolean;
+  protected status: ScraperStatus;
   constructor(db?: DB) {
     this.db = db;
   }
@@ -30,7 +32,10 @@ export abstract class Scraper<Dto = void> {
    * Validates and saves the Json data from the scraping run to the database
    * @param data
    */
-  protected async saveJson(data: Dto | Dto[]): Promise<void> {
+  protected async saveScrapedData(
+    data: Dto | Dto[],
+    screenshot: Buffer
+  ): Promise<void> {
     const parsedData = this.validateJson(data);
     const latestHash = await this.db.getLatestJsonHash(this.knownId);
     const json = JSON.stringify(parsedData);
@@ -52,11 +57,13 @@ export abstract class Scraper<Dto = void> {
         runId: this.runId,
       });
 
+      // Save the screenshot
+      await this.saveScreenshot(screenshot);
+
       // Update this run status
       await this.db.updateRunStatus(this.runId, "success");
       return;
     }
-
     Logger.log(`✅ [${this.name}] no data change detected, skipping save`);
     await this.db.updateRunStatus(this.runId, "cached");
   }
@@ -78,6 +85,12 @@ export abstract class Scraper<Dto = void> {
       throw error;
     }
   }
+  protected async saveScreenshot(screenshot: Buffer): Promise<void> {
+    const base64String = btoa(
+      String.fromCharCode(...new Uint8Array(screenshot))
+    );
+    await this.db.saveScreenshot(this.runId, this.knownId, base64String);
+  }
   /**
    * Scrapes the data from the website and saves it to the database
    * @param data
@@ -86,6 +99,7 @@ export abstract class Scraper<Dto = void> {
   get model(): IScraper {
     return {
       name: this.name,
+      status: this.status,
       knownId: this.knownId,
       associatedWidgets: this.associatedWidgets,
       shouldNotifyChanges: this.shouldNotifyChanges,
