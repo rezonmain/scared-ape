@@ -77,6 +77,7 @@ export class SQLiteDB extends DB {
   }
 
   async registerScraper(scraper: IScraper): Promise<void> {
+    throw new Error("Method not correctly implemented.");
     const query =
       "INSERT INTO scraper (knownId, name, associatedWidgets) VALUES (?, ?, ?)";
     try {
@@ -99,7 +100,7 @@ export class SQLiteDB extends DB {
 
   async registerManyScrapers(scrapers: IScraper[]): Promise<void> {
     const query =
-      "INSERT INTO scraper (name, status, knownId, associatedWidgets) VALUES (?, ?, ?, ?)";
+      "INSERT INTO scraper (name, status, knownId, shouldNotifyChanges, associatedWidgets) VALUES (?, ?, ?, ?, ?)";
     const stmt = this.db.prepare(query);
     const insertMany = this.db.transaction(() => {
       scrapers.forEach((scraper) => {
@@ -107,6 +108,7 @@ export class SQLiteDB extends DB {
           scraper.name,
           scraper.status,
           scraper.knownId,
+          scraper.shouldNotifyChanges ? 1 : 0,
           scraper.associatedWidgets.join(",")
         );
         Logger.log(

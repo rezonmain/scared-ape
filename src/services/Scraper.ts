@@ -13,6 +13,7 @@ export abstract class Scraper<Dto = void> {
   protected runId: Run["id"];
   protected url: string;
   protected dtoValidator: z.ZodSchema<Dto>;
+  protected shouldNotifyChanges: boolean;
   constructor(db?: DB) {
     this.db = db;
   }
@@ -87,6 +88,7 @@ export abstract class Scraper<Dto = void> {
       name: this.name,
       knownId: this.knownId,
       associatedWidgets: this.associatedWidgets,
+      shouldNotifyChanges: this.shouldNotifyChanges,
     };
   }
 }

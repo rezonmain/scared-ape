@@ -12,6 +12,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
     super(database);
     this.url = "https://linusmediagroup.com/jobs";
     this.dtoValidator = LMGJobsDTOSchema;
+    this.shouldNotifyChanges = true;
   }
 
   get name(): string {
