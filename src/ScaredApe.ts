@@ -44,7 +44,6 @@ export class ScaredApe {
       activeScrapers.map((scraper) => this.runScraper(scraper.name))
     );
     Logger.log("✅ [🦍App][run()] All active scrapers finished running.");
-    await this.db.disconnect();
   }
 
   /**
