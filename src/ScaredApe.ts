@@ -14,7 +14,7 @@ export class ScaredApe {
   constructor() {
     this.db = new SQLiteDB();
     this.scheduler = new Scheduler(this.db);
-    this.api = new Api();
+    this.api = new Api(this.db, this.scheduler);
   }
 
   async bootstrap() {
@@ -32,6 +32,8 @@ export class ScaredApe {
       activeScrapers.map((scraper) => this.runScraper(scraper.name))
     );
     Logger.log("✅ [🦍App][run()] All active scrapers finished running.");
+
+    // Start the scheduler and API
     this.scheduler.start();
     this.api.start();
   }
