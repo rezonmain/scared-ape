@@ -22,13 +22,13 @@ export class ScaredApe {
 
   async run() {
     // Run all the active scrapers
-    Logger.log("🚀 [App][run()] Starting active scrapers...");
+    Logger.log("🔄 [🦍App][run()] Starting active scrapers...");
     const activeScrapers = await this.db.getActiveScrapers();
     await Promise.all(
       activeScrapers.map((scraper) => this.runScraper(scraper.name))
     );
-    Logger.log("🚀 [App][run()] All active scrapers finished running.");
-    Logger.log("🚀 [App][run()] Starting scheduler...");
+    Logger.log("✅ [🦍App][run()] All active scrapers finished running.");
+    Logger.log("🔄 [🦍App][run()] Starting scheduler...");
     // this.scheduler.start();
     // this.api.start();
   }

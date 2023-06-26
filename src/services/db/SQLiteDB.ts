@@ -26,6 +26,7 @@ export class SQLiteDB extends DB {
   }
 
   async migrate(): Promise<void> {
+    Logger.log(`🔄 [💾SQLite ${this.name}][migrate()] Running migrations...`);
     const migrations = await MigrationsHelper.getAll();
     const currentVersion = await this.getMigrationVersion();
     // Loop over all migrations
@@ -33,7 +34,7 @@ export class SQLiteDB extends DB {
       // If the migration version is less than or equal to the current version, skip it
       if (migration.version <= currentVersion) {
         Logger.log(
-          `⏭️  [SQLite ${this.name}][migrate()] Skipping migration: ${migration.name} version: ${migration.version}`
+          `⏭️  [💾SQLite ${this.name}][migrate()] Skipping migration: ${migration.name} version: ${migration.version}`
         );
         continue;
       }
@@ -49,18 +50,18 @@ export class SQLiteDB extends DB {
         })();
       } catch (error) {
         Logger.error(
-          `❌ [SQLite ${this.name}][migrate()] Error running migration ${migration.name} rolling back transaction...`,
+          `❌ [💾SQLite ${this.name}][migrate()] Error running migration ${migration.name} rolling back transaction...`,
           "\n",
           error
         );
         Logger.logAndExit("😤 Unable to run migrations 😤");
       }
       Logger.log(
-        `✅ [SQLite ${this.name}][migrate()] OK Migration: ${migration.name}, version: ${migration.version}`
+        `🔄 [💾SQLite ${this.name}][migrate()] OK Migration: ${migration.name}, version: ${migration.version}`
       );
     }
     Logger.log(
-      `✅ [SQLite ${this.name}][migrate()] Successfully ran all migrations`
+      `✅ [💾SQLite ${this.name}][migrate()] Successfully ran all migrations`
     );
   }
 
@@ -68,7 +69,7 @@ export class SQLiteDB extends DB {
     try {
       this.db.close();
       Logger.log(
-        `✅ [SQLite ${this.name}][disconnect()] Disconnected from the ${this.name} database`
+        `✅ [💾SQLite ${this.name}][disconnect()] Disconnected from the ${this.name} database`
       );
     } catch (error) {
       Logger.error(error);
@@ -87,7 +88,7 @@ export class SQLiteDB extends DB {
           scraper.associatedWidgets.join(",")
         );
       Logger.log(
-        `✅ [SQLite ${this.name}][registerScraper()] Query -> ${query} with ${
+        `✅ [💾SQLite ${this.name}][registerScraper()] Query -> ${query} with ${
           scraper.knownId
         }, ${scraper.name}, ${scraper.associatedWidgets.join(",")}`
       );
@@ -109,7 +110,7 @@ export class SQLiteDB extends DB {
           scraper.associatedWidgets.join(",")
         );
         Logger.log(
-          `✅ [SQLite ${
+          `✅ [💾SQLite ${
             this.name
           }][registerManyScrapers()] Query -> ${query} with ${Object.values(
             scraper
@@ -131,7 +132,7 @@ export class SQLiteDB extends DB {
     try {
       const scraper = this.db.prepare(query).get(knownId);
       Logger.log(
-        `✅ [SQLite ${this.name}][getScraperbyKnownId()] Query -> ${query} with knownId: ${knownId}`
+        `✅ [💾SQLite ${this.name}][getScraperbyKnownId()] Query -> ${query} with knownId: ${knownId}`
       );
       return scraper ? (scraper as IScraper) : undefined;
     } catch (error) {
@@ -144,7 +145,7 @@ export class SQLiteDB extends DB {
     try {
       const scrapers = this.db.prepare(query).all() as IScraper[];
       Logger.log(
-        `✅ [SQLite ${this.name}][getAllScrapers()] Query -> ${query}`
+        `✅ [💾SQLite ${this.name}][getAllScrapers()] Query -> ${query}`
       );
       return scrapers;
     } catch (error) {
@@ -157,7 +158,7 @@ export class SQLiteDB extends DB {
     try {
       const scrapers = this.db.prepare(query).all() as IScraper[];
       Logger.log(
-        `✅ [SQLite ${this.name}][getActiveScrapers()] Query -> ${query}`
+        `✅ [💾SQLite ${this.name}][getActiveScrapers()] Query -> ${query}`
       );
       return scrapers;
     } catch (error) {
@@ -185,7 +186,7 @@ export class SQLiteDB extends DB {
         .prepare(query)
         .run(scraper.id, json.json, json.cacheHash, json.runId);
       Logger.log(
-        `✅ [SQLite ${this.name}][saveJson()] Query -> ${query} with ${scraper.id}, -, ${json.cacheHash}, ${json.runId}`
+        `✅ [💾SQLite ${this.name}][saveJson()] Query -> ${query} with ${scraper.id}, -, ${json.cacheHash}, ${json.runId}`
       );
     } catch (error) {
       Logger.error(error);
@@ -197,7 +198,7 @@ export class SQLiteDB extends DB {
     try {
       this.db.prepare(query).run(json.status, json.id);
       Logger.log(
-        `✅ [SQLite ${this.name}][upateJson()] Query -> ${query} with ${json.status}, ${json.id}`
+        `✅ [💾SQLite ${this.name}][upateJson()] Query -> ${query} with ${json.status}, ${json.id}`
       );
     } catch (error) {
       Logger.error(error);
@@ -215,7 +216,7 @@ export class SQLiteDB extends DB {
         | { cacheHash: string }
         | undefined;
       Logger.log(
-        `✅ [SQLite ${this.name}][getLatestJsonHash()] Query -> ${query} with scraperId: ${scraper.id}`
+        `✅ [💾SQLite ${this.name}][getLatestJsonHash()] Query -> ${query} with scraperId: ${scraper.id}`
       );
       return res ? res.cacheHash : undefined;
     } catch (error) {
@@ -231,7 +232,7 @@ export class SQLiteDB extends DB {
       const scraper = await this.getScraperbyKnownId(scraperKnownId);
       const json = this.db.prepare(query).get(scraper.id);
       Logger.log(
-        `✅ [SQLite ${this.name}][getLatestJson()] Query -> ${query} with scraperId: ${scraper.id}`
+        `✅ [💾SQLite ${this.name}][getLatestJson()] Query -> ${query} with scraperId: ${scraper.id}`
       );
       return json ? (json as Json) : undefined;
     } catch (error) {
@@ -274,7 +275,7 @@ export class SQLiteDB extends DB {
       const scraper = await this.getScraperbyKnownId(scraperKnownId);
       const res = this.db.prepare(query).run(scraper.id);
       Logger.log(
-        `✅ [SQLite ${this.name}][saveRun()] Query -> ${query} with ${scraper.id}`
+        `✅ [💾SQLite ${this.name}][saveRun()] Query -> ${query} with ${scraper.id}`
       );
       return res.lastInsertRowid;
     } catch (error) {
@@ -294,7 +295,7 @@ export class SQLiteDB extends DB {
     try {
       this.db.prepare(query).run(status, runId);
       Logger.log(
-        `✅ [SQLite ${this.name}][updateRunStatus()] Query -> ${query} with ${status}, ${runId}`
+        `✅ [💾SQLite ${this.name}][updateRunStatus()] Query -> ${query} with ${status}, ${runId}`
       );
     } catch (error) {
       Logger.error(error);
@@ -306,7 +307,7 @@ export class SQLiteDB extends DB {
     try {
       this.db.prepare(query).run(user);
       Logger.log(
-        `✅ [SQLite ${this.name}][saveUser()] Query -> ${query} with ${user.email}, ${user.role}`
+        `✅ [💾SQLite ${this.name}][saveUser()] Query -> ${query} with ${user.email}, ${user.role}`
       );
     } catch (error) {
       Logger.error(error);
@@ -318,7 +319,7 @@ export class SQLiteDB extends DB {
     try {
       const user = this.db.prepare(query).get(email);
       Logger.log(
-        `✅ [SQLite ${this.name}][getUser()] Query -> ${query} with ${email}`
+        `✅ [💾SQLite ${this.name}][getUser()] Query -> ${query} with ${email}`
       );
       return user ? (user as User) : undefined;
     } catch (error) {
