@@ -9,6 +9,7 @@
     "build": "tsc",
     "bs": "pnpm build:swc && node dist/cli/bootstrap.js",
     "dev": "pnpm build:swc && (pnpm watch:swc & NODE_ENV=dev nodemon dist/index.js)",
+    "pre": "pnpm lint & pnpm type-check",
     "dev:noWatch": "NODE=dev node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
