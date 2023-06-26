@@ -92,7 +92,9 @@ export abstract class DB {
    * Get the latest serialized JSON from a scrape run, formatted as the corresponding DTO from the database.
    * @param scraperKnownId
    */
-  abstract getLatestJson(scraperKnownId: IScraper["knownId"]): Promise<Json>;
+  abstract getLatestJson(
+    scraperKnownId: IScraper["knownId"]
+  ): Promise<Json | undefined>;
 
   /**
    * Update a Json record.
