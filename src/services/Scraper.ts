@@ -16,6 +16,7 @@ export abstract class Scraper<Dto = void> {
   protected dtoValidator: z.ZodSchema<Dto>;
   protected shouldNotifyChanges: boolean;
   protected status: ScraperStatus;
+  protected interval: IScraper["interval"]; // In seconds
   constructor(db?: DB) {
     this.db = db;
   }
@@ -101,6 +102,7 @@ export abstract class Scraper<Dto = void> {
       name: this.name,
       status: this.status,
       knownId: this.knownId,
+      interval: this.interval,
       associatedWidgets: this.associatedWidgets,
       shouldNotifyChanges: this.shouldNotifyChanges,
     };

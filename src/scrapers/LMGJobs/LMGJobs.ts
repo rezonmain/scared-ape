@@ -14,6 +14,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
     this.dtoValidator = LMGJobsDTOSchema;
     this.shouldNotifyChanges = true;
     this.status = "active";
+    this.interval = 1 * 60; // 1 minute
   }
 
   get name(): string {
