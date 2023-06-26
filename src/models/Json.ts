@@ -3,8 +3,8 @@ import { Entity } from "./Entity.js";
 
 export interface Json extends Entity {
   scraperId: number;
-  runId: number;
+  runId: number | bigint;
   json: string;
   cacheHash: string;
-  status: JsonStatus; // default "latest"
+  status?: JsonStatus; // default "latest"
 }

@@ -165,49 +165,105 @@ export class SQLiteDB extends DB {
     return this.db.pragma("user_version", { simple: true }) as number;
   }
 
-  saveScrappedJSON(
+  async saveJson(
     scraperKnownId: IScraper["knownId"],
-    serializedJSON: Json["json"]
+    json: Omit<Json, "scraperId">
   ): Promise<void> {
+    const query =
+      "INSERT INTO json (scraperId, json, cacheHash, runId) VALUES (?, ?, ?, ?)";
+    try {
+      const scraper = await this.getScraperbyKnownId(scraperKnownId);
+      this.db
+        .prepare(query)
+        .run(scraper.id, json.json, json.cacheHash, json.runId);
+      Logger.log(`✅ [SQLite ${this.name}] Query -> ${query}`);
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  updateJson(json: Json): Promise<void> {
+    const query = "UPDATE json SET status = ? WHERE id = ?";
+    try {
+      this.db.prepare(query).run(json.status, json.id);
+    } catch (error) {
+      Logger.error(error);
+    }
     throw new Error("Method not implemented");
   }
 
-  getScrappedJSON(scraperKnownId: IScraper["knownId"]): Promise<Json> {
+  async getLatestJsonHash(
+    scraperKnownId: IScraper["knownId"]
+  ): Promise<string | undefined> {
+    const query =
+      "SELECT cacheHash FROM json WHERE scraperId = ? ORDER BY id DESC LIMIT 1";
+    try {
+      const scraper = await this.getScraperbyKnownId(scraperKnownId);
+      const hash = this.db.prepare(query).get(scraper.id);
+      Logger.log(
+        `✅ [SQLite ${this.name}] Query -> ${query} with knownId: ${scraperKnownId}`
+      );
+      return hash ? (hash as string) : undefined;
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  getLatestJson(scraperKnownId: IScraper["knownId"]): Promise<Json> {
     throw new Error("Method not implemented");
   }
 
-  getScrappedJSONById(jsonId: Json["id"]): Promise<Json> {
+  getJsonById(jsonId: Json["id"]): Promise<Json> {
     throw new Error("Method not implemented");
   }
 
-  getScrappedJSONByRunId(runId: Run["id"]): Promise<Json> {
+  getJsonByRunId(runId: Run["id"]): Promise<Json> {
     throw new Error("Method not implemented");
   }
 
-  savePageScreenshot(
+  saveScreenshot(
     scraperKnownId: IScraper["knownId"],
     base64Image: Screenshot["image"]
   ): Promise<void> {
     throw new Error("Method not implemented");
   }
 
-  getPageScreenshot(scraperKnownId: IScraper["knownId"]): Promise<Screenshot> {
+  getLatestScreenshot(
+    scraperKnownId: IScraper["knownId"]
+  ): Promise<Screenshot> {
     throw new Error("Method not implemented");
   }
 
-  getPageScreenshotById(screenshotId: Screenshot["id"]): Promise<Screenshot> {
+  getScreenshotById(screenshotId: Screenshot["id"]): Promise<Screenshot> {
     throw new Error("Method not implemented");
   }
 
-  getPageScreenshotByRunId(runId: Run["id"]): Promise<Screenshot> {
+  getScreenshotByRunId(runId: Run["id"]): Promise<Screenshot> {
     throw new Error("Method not implemented");
   }
 
-  saveScrapeRun(scraperKnownId: IScraper["knownId"]): Promise<void> {
+  async saveRun(scraperKnownId: IScraper["knownId"]): Promise<Run["id"]> {
+    const query = "INSERT INTO run (scraperId) VALUES (?)";
+    try {
+      const scraper = await this.getScraperbyKnownId(scraperKnownId);
+      const res = this.db.prepare(query).run(scraper.id);
+      Logger.log(
+        `✅ [SQLite ${this.name}] Query -> ${query} with ${scraperKnownId}`
+      );
+      return res.lastInsertRowid;
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  getLatestRun(scraperKnownId: IScraper["knownId"]): Promise<Run> {
     throw new Error("Method not implemented");
   }
 
-  getScrapeRun(scraperKnownId: IScraper["knownId"]): Promise<Run> {
+  async updateRunStatus(
+    runId: Run["id"],
+    status: Run["status"]
+  ): Promise<void> {
     throw new Error("Method not implemented");
   }
 
@@ -232,14 +288,6 @@ export class SQLiteDB extends DB {
     } catch (error) {
       Logger.error(error);
     }
-  }
-
-  updateScrapeRunStatus(
-    scraperKnownId: IScraper["knownId"],
-    runId: Run["id"],
-    status: Run["status"]
-  ): Promise<void> {
-    throw new Error("Method not implemented");
   }
 
   saveAccessRequest(email: AccessRequest["email"]): Promise<void> {

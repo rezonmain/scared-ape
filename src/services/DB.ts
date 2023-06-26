@@ -75,35 +75,49 @@ export abstract class DB {
    * @param scraperKnownId
    * @param serializedJSON
    */
-  abstract saveScrappedJSON(
+  abstract saveJson(
     scraperKnownId: IScraper["knownId"],
-    serializedJSON: Json["json"]
+    json: Omit<Json, "scraperId">
   ): Promise<void>;
+
+  /**
+   * Get the latest Json hash to compare with the latest scraped Json.
+   * @param scraperKnownId
+   */
+  abstract getLatestJsonHash(
+    scraperKnownId: IScraper["knownId"]
+  ): Promise<string | undefined>;
 
   /**
    * Get the latest serialized JSON from a scrape run, formatted as the corresponding DTO from the database.
    * @param scraperKnownId
    */
-  abstract getScrappedJSON(scraperKnownId: IScraper["knownId"]): Promise<Json>;
+  abstract getLatestJson(scraperKnownId: IScraper["knownId"]): Promise<Json>;
+
+  /**
+   * Update a Json record.
+   * @param json
+   */
+  abstract updateJson(json: Json): Promise<void>;
 
   /**
    * Get the serialized JSON from a scrape run, using its ID
    * @param jsonId
    */
-  abstract getScrappedJSONById(jsonId: Json["id"]): Promise<Json>;
+  abstract getJsonById(jsonId: Json["id"]): Promise<Json>;
 
   /**
    * Get the serialized JSON from a scrape run, using its runID
    * @param jsonId
    */
-  abstract getScrappedJSONByRunId(runId: Run["id"]): Promise<Json>;
+  abstract getJsonByRunId(runId: Run["id"]): Promise<Json>;
 
   /**
    * Save the screenshot of the scraped page to the database.
    * @param scraperKnownId
    * @param base64Image
    */
-  abstract savePageScreenshot(
+  abstract saveScreenshot(
     scraperKnownId: IScraper["knownId"],
     base64Image: Screenshot["image"]
   ): Promise<void>;
@@ -112,7 +126,7 @@ export abstract class DB {
    * Get the latest screenshot of the scraped page from the database.
    * @param scraperKnownId
    */
-  abstract getPageScreenshot(
+  abstract getLatestScreenshot(
     scraperKnownId: IScraper["knownId"]
   ): Promise<Screenshot>;
 
@@ -120,7 +134,7 @@ export abstract class DB {
    * Get a screenshot from a scrape run, using its ID
    * @param scraperKnownId
    */
-  abstract getPageScreenshotById(
+  abstract getScreenshotById(
     screenshotId: Screenshot["id"]
   ): Promise<Screenshot>;
 
@@ -128,21 +142,32 @@ export abstract class DB {
    * Get a screenshot from a scrape run, using its run ID
    * @param scraperKnownId
    */
-  abstract getPageScreenshotByRunId(runId: Run["id"]): Promise<Screenshot>;
+  abstract getScreenshotByRunId(runId: Run["id"]): Promise<Screenshot>;
 
   /**
    * Save a scrape run metadata to the database.
    * @param scraperKnownId
    * @param runId
    */
-  abstract saveScrapeRun(scraperKnownId: IScraper["knownId"]): Promise<void>;
+  abstract saveRun(scraperKnownId: IScraper["knownId"]): Promise<Run["id"]>;
 
   /**
    * Get the latest scrape run of the passed scraperKnownId.
    * @param scraperKnownId
    * @param runId
    */
-  abstract getScrapeRun(scraperKnownId: IScraper["knownId"]): Promise<Run>;
+  abstract getLatestRun(scraperKnownId: IScraper["knownId"]): Promise<Run>;
+
+  /**
+   * Update the status of a scrape run.
+   * @param scraperKnownId
+   * @param runId
+   * @param status
+   */
+  abstract updateRunStatus(
+    runId: Run["id"],
+    status: Run["status"]
+  ): Promise<void>;
 
   /**
    * Save a user to the database.
@@ -155,18 +180,6 @@ export abstract class DB {
    */
 
   abstract getUser(email: User["email"]): Promise<User | undefined>;
-
-  /**
-   * Update the status of a scrape run.
-   * @param scraperKnownId
-   * @param runId
-   * @param status
-   */
-  abstract updateScrapeRunStatus(
-    scraperKnownId: IScraper["knownId"],
-    runId: Run["id"],
-    status: Run["status"]
-  ): Promise<void>;
 
   /**
    * Save an access request to the database.
