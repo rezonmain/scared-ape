@@ -11,4 +11,7 @@
   pyro: {
     email: "",
   },
+  api: {
+    port: 3000,
+  },
 }
