@@ -10,6 +10,10 @@ export class Scheduler {
     this.toadScheduler = new ToadScheduler();
   }
 
+  /**
+   * Add a job to the scheduler
+   * @param obj
+   */
   public addJob({
     fn,
     name,
@@ -50,16 +54,29 @@ export class Scheduler {
     return this.jobs.find((job) => job.id === name);
   }
 
+  /**
+   * Start the scheduler
+   * add a job for each active scraper
+   */
   public async start() {
     Logger.log("🔄 [🦎Scheduler][start()] Starting scheduler...");
     const activeScrapers = await this.db.getActiveScrapers();
+
+    /**
+     * For each active scraper,
+     * create a job that runs the scraper's scrape() method
+     */
     activeScrapers.forEach(async (scraper) => {
-      const scraperInstance = await ScrapersHelper.getScraperInstance(
-        scraper.name,
-        this.db
-      );
+      const fn = async () => {
+        const scraperInstance = await ScrapersHelper.getScraperInstance(
+          scraper.name,
+          this.db
+        );
+        scraperInstance.scrape();
+      };
+
       this.addJob({
-        fn: scraperInstance.scrape,
+        fn,
         name: scraper.name,
         interval: scraper.interval,
       });

@@ -14,4 +14,7 @@
   api: {
     port: 3000,
   },
+  app: {
+    bootstrapOnStartup: false,
+  },
 }

@@ -7,24 +7,36 @@ import { IScraper } from "./models/Scraper.js";
 import { Scheduler } from "./services/Scheduler.js";
 import { Api } from "./services/api/Api.js";
 
+/**
+ * The main app class
+ */
 export class ScaredApe {
   private db: DB;
-  private api;
-  private scheduler;
+  private api: Api;
+  private scheduler: Scheduler;
   constructor() {
     this.db = new SQLiteDB();
     this.scheduler = new Scheduler(this.db);
     this.api = new Api(this.db, this.scheduler);
   }
 
+  private async runScraper(name: IScraper["name"]) {
+    const scraper = await ScrapersHelper.getScraperInstance(name, this.db);
+    await scraper.scrape();
+  }
+
+  /**
+   * Bootstrap the app
+   * - Connect to the database
+   * - Run migrations
+   * - Seed the database
+   * - Run all the active scrapers
+   */
   async bootstrap() {
     await this.db.connect();
     await this.db.migrate();
     const seeder = new Seeder(this.db);
     await seeder.seed();
-  }
-
-  async run() {
     // Run all the active scrapers
     Logger.log("🔄 [🦍App][run()] Starting active scrapers...");
     const activeScrapers = await this.db.getActiveScrapers();
@@ -32,14 +44,18 @@ export class ScaredApe {
       activeScrapers.map((scraper) => this.runScraper(scraper.name))
     );
     Logger.log("✅ [🦍App][run()] All active scrapers finished running.");
-
-    // Start the scheduler and API
-    this.scheduler.start();
-    this.api.start();
+    await this.db.disconnect();
   }
 
-  private async runScraper(name: IScraper["name"]) {
-    const scraper = await ScrapersHelper.getScraperInstance(name, this.db);
-    await scraper.scrape();
+  /**
+   * Run the app
+   * - Connect to the database
+   * - Start the scheduler
+   * - Start the api
+   */
+  async run() {
+    this.db.connect();
+    this.scheduler.start();
+    this.api.start();
   }
 }
