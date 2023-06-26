@@ -1,8 +1,8 @@
 import config from "config";
 import express from "express";
 import { Logger } from "../../utils/Logger.js";
-import { DB } from "../db/DB.js";
-import { Scheduler } from "../scheduler/Scheduler.js";
+import type { DB } from "../db/DB.js";
+import type { Scheduler } from "../scheduler/Scheduler.js";
 
 export class Api {
   private ex: express.Express;

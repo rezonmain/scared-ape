@@ -1,7 +1,8 @@
 import puppeteer from "puppeteer";
 import type { DB } from "../../services/db/DB.js";
 import { Scraper } from "../../services/Scraper.js";
-import { LMGJobsDTO, LMGJobsDTOSchema } from "./LMGJobs.dto.js";
+import type { LMGJobsDTO } from "./LMGJobs.dto.js";
+import { LMGJobsDTOSchema } from "./LMGJobs.dto.js";
 import { Logger } from "../../utils/Logger.js";
 
 /*

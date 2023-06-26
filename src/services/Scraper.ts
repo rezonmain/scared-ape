@@ -1,10 +1,10 @@
-import { z } from "zod";
-import { Run } from "../models/Run.js";
-import { IScraper } from "../models/Scraper.js";
-import { DB } from "./db/DB.js";
+import type { z } from "zod";
+import type { Run } from "../models/Run.js";
+import type { IScraper } from "../models/Scraper.js";
+import type { DB } from "./db/DB.js";
 import { CacheHelper } from "../utils/CacheHelper.js";
 import { Logger } from "../utils/Logger.js";
-import { ScraperStatus } from "../constants/scraperStatus.js";
+import type { ScraperStatus } from "../constants/scraperStatus.js";
 
 /*
   This is the base class for all scrapers.

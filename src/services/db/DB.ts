@@ -1,10 +1,10 @@
-import { AccessRequest } from "../../models/AccessRequest.js";
-import { Json } from "../../models/Json.js";
-import { Run } from "../../models/Run.js";
-import { IScraper } from "../../models/Scraper.js";
-import { Screenshot } from "../../models/Screenshot.js";
+import type { AccessRequest } from "../../models/AccessRequest.js";
+import type { Json } from "../../models/Json.js";
+import type { Run } from "../../models/Run.js";
+import type { IScraper } from "../../models/Scraper.js";
+import type { Screenshot } from "../../models/Screenshot.js";
 import config from "config";
-import { User } from "../../models/User.js";
+import type { User } from "../../models/User.js";
 
 /**
  * The database service, this is the interface that all database services should implement.

@@ -1,12 +1,12 @@
-import { AccessRequest } from "../../models/AccessRequest.js";
-import { Json } from "../../models/Json.js";
-import { Run } from "../../models/Run.js";
-import { IScraper } from "../../models/Scraper.js";
-import { Screenshot } from "../../models/Screenshot.js";
+import type { AccessRequest } from "../../models/AccessRequest.js";
+import type { Json } from "../../models/Json.js";
+import type { Run } from "../../models/Run.js";
+import type { IScraper } from "../../models/Scraper.js";
+import type { Screenshot } from "../../models/Screenshot.js";
 import { MigrationsHelper } from "../../utils/MigrationsHelper.js";
 import { DB } from "./DB.js";
 import Database from "better-sqlite3";
-import { User } from "../../models/User.js";
+import type { User } from "../../models/User.js";
 import { Logger } from "../../utils/Logger.js";
 
 export class SQLiteDB extends DB {

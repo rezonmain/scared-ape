@@ -1,5 +1,5 @@
-import { UserRole } from "../constants/userRole.js";
-import { Entity } from "./Entity.js";
+import type { UserRole } from "../constants/userRole.js";
+import type { Entity } from "./Entity.js";
 
 export interface User extends Entity {
   email: string;

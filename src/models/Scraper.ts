@@ -1,5 +1,5 @@
-import { ScraperStatus } from "../constants/scraperStatus.js";
-import { Entity } from "./Entity.js";
+import type { ScraperStatus } from "../constants/scraperStatus.js";
+import type { Entity } from "./Entity.js";
 
 export interface IScraper extends Entity {
   knownId: string;

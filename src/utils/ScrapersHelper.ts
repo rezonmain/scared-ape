@@ -1,8 +1,8 @@
 import fs from "fs/promises";
 import config from "config";
-import { Scraper } from "../services/Scraper.js";
-import { IScraper } from "../models/Scraper.js";
-import { DB } from "../services/db/DB.js";
+import type { Scraper } from "../services/Scraper.js";
+import type { IScraper } from "../models/Scraper.js";
+import type { DB } from "../services/db/DB.js";
 
 export class ScrapersHelper {
   static pathname = config.get("scrapers.path") as string;

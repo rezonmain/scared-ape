@@ -1,9 +1,9 @@
-import { DB } from "./services/db/DB.js";
+import type { DB } from "./services/db/DB.js";
 import { SQLiteDB } from "./services/db/SQLiteDB.js";
 import { Seeder } from "./services/Seeder.js";
 import { ScrapersHelper } from "./utils/ScrapersHelper.js";
 import { Logger } from "./utils/Logger.js";
-import { IScraper } from "./models/Scraper.js";
+import type { IScraper } from "./models/Scraper.js";
 import { Scheduler } from "./services/scheduler/Scheduler.js";
 import { Api } from "./services/api/Api.js";
 

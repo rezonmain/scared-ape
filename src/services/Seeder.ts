@@ -1,8 +1,7 @@
 import config from "config";
-import { DB } from "./db/DB.js";
+import type { DB } from "./db/DB.js";
 import { ScrapersHelper } from "../utils/ScrapersHelper.js";
 import { Logger } from "../utils/Logger.js";
-import { ScraperStatus } from "../constants/scraperStatus.js";
 
 export class Seeder {
   constructor(private db: DB) {}

@@ -1,4 +1,4 @@
-import { Entity } from "./Entity.js";
+import type { Entity } from "./Entity.js";
 
 export interface Screenshot extends Entity {
   scraperId: number;
