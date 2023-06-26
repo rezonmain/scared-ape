@@ -1,10 +1,9 @@
-import { Browser } from "puppeteer";
-import { DB } from "./services/DB.js";
-import { SQLiteDB } from "./services/SQLiteDB.js";
+import { DB } from "./services/db/DB.js";
+import { SQLiteDB } from "./services/db/SQLiteDB.js";
 import { Seeder } from "./services/Seeder.js";
-import { Scraper } from "./services/Scraper.js";
 import { ScrapersHelper } from "./utils/ScrapersHelper.js";
 import { Logger } from "./utils/Logger.js";
+import { IScraper } from "./models/Scraper.js";
 
 export class ScaredApe {
   private db: DB;
@@ -34,7 +33,7 @@ export class ScaredApe {
     // this.api.start();
   }
 
-  private async runScraper(name: Scraper["name"]) {
+  private async runScraper(name: IScraper["name"]) {
     const scraper = await ScrapersHelper.getScraperInstance(name, this.db);
     await scraper.scrape();
   }

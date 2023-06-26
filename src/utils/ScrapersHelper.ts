@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import config from "config";
 import { Scraper } from "../services/Scraper.js";
 import { IScraper } from "../models/Scraper.js";
-import { DB } from "../services/DB.js";
+import { DB } from "../services/db/DB.js";
 
 export class ScrapersHelper {
   static pathname = config.get("scrapers.path") as string;
@@ -11,10 +11,16 @@ export class ScrapersHelper {
     return await fs.readdir(this.pathname);
   }
 
+  /**
+   * Scraper factory
+   * @param scraperName
+   * @param db
+   * @returns a Scraper instance
+   */
   static async getScraperInstance(
     scraperName: string,
     db?: DB
-  ): Promise<Scraper> {
+  ): Promise<Scraper<void>> {
     try {
       const scraper = await import(
         `../scrapers/${scraperName}/${scraperName}.js`
@@ -25,7 +31,7 @@ export class ScrapersHelper {
     }
   }
 
-  static async getAll(): Promise<Scraper[]> {
+  static async getAll(): Promise<Scraper<void>[]> {
     return await Promise.all(
       (
         await this.list()
