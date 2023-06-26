@@ -4,6 +4,8 @@ import { Seeder } from "./services/Seeder.js";
 import { ScrapersHelper } from "./utils/ScrapersHelper.js";
 import { Logger } from "./utils/Logger.js";
 import { IScraper } from "./models/Scraper.js";
+import { Scheduler } from "./services/Scheduler.js";
+import { Api } from "./services/api/Api.js";
 
 export class ScaredApe {
   private db: DB;
@@ -11,6 +13,8 @@ export class ScaredApe {
   private scheduler;
   constructor() {
     this.db = new SQLiteDB();
+    this.scheduler = new Scheduler(this.db);
+    this.api = new Api();
   }
 
   async bootstrap() {
@@ -28,9 +32,8 @@ export class ScaredApe {
       activeScrapers.map((scraper) => this.runScraper(scraper.name))
     );
     Logger.log("✅ [🦍App][run()] All active scrapers finished running.");
-    Logger.log("🔄 [🦍App][run()] Starting scheduler...");
-    // this.scheduler.start();
-    // this.api.start();
+    await this.scheduler.start();
+    this.api.start();
   }
 
   private async runScraper(name: IScraper["name"]) {
