@@ -1,4 +1,4 @@
-import { object, z } from "zod";
+import { z } from "zod";
 import { Run } from "../models/Run.js";
 import { IScraper } from "../models/Scraper.js";
 import { DB } from "./db/DB.js";
