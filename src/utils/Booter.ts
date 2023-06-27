@@ -8,8 +8,9 @@ import JSON5 from "json5";
 import { FileHelper } from "./FileHelper.js";
 import { isNothingOrZero } from "./ez.js";
 import c from "config";
-import { input } from "@inquirer/prompts";
 import { Telegram } from "../services/notifier/Telegram/Telegram.js";
+import inquirer from "inquirer";
+import _ from "lodash";
 
 /**
  * Automate the app bootrapping process
@@ -17,12 +18,12 @@ import { Telegram } from "../services/notifier/Telegram/Telegram.js";
  */
 export class Booter {
   private environment: string;
-  private inputConfig: Map<string, string>;
+  private inputConfig: object;
   private db: DB;
   private cache: Cache;
   constructor(environment?: string) {
     this.environment = environment ?? process.env.NODE_ENV ?? "dev";
-    this.inputConfig = new Map<string, string>();
+    this.inputConfig = {};
   }
 
   get env() {
@@ -70,15 +71,20 @@ export class Booter {
       Logger.log(
         "➡️ [👾Booter][configureTelegram()] Bot token not found, please create a Telegram bot and enter the token below:"
       );
-      this.inputConfig.set(
-        "notifier.telegram.token",
-        await input({
-          message: "Enter a value for notifier.telegram.token:",
-        })
-      );
+      await inquirer
+        .prompt([
+          {
+            name: "notifier.telegram.token",
+            message: "Enter a value for notifier.telegram.token:",
+          },
+        ])
+        .then((answers) => {
+          Object.assign(this.inputConfig, answers);
+        });
     } else {
-      this.inputConfig.set("notifier.telegram.token", token);
+      Object.assign(this.inputConfig, { notfier: { telegram: token } });
     }
+
     if (recipientChatId) {
       Logger.log(
         "✅ [👾Booter][configureTelegram()] Telegram config looks good"
@@ -88,15 +94,23 @@ export class Booter {
     Logger.log(
       "🔄 [👾Booter][configureTelegram()] Starting up Telegram bot with provided token... use /id to get your recipientChatId"
     );
-    const gram = new Telegram(this.inputConfig.get("notifier.telegram.token"));
-    gram.start();
-    this.inputConfig.set(
-      "notifier.telegram.recipientChatId",
-      await input({
-        message: "Enter a value for notifier.telegram.recipientChatId:",
-      })
+    const gram = new Telegram(
+      _.get(this.inputConfig, "notifier.telegram.token")
     );
-    Logger.log("✅ [👾Booter][configureTelegram()] Telegram config looks good");
+    gram.start();
+
+    await inquirer
+      .prompt([
+        {
+          name: "notifier.telegram.token",
+          message: "Enter a value for notifier.telegram.recipientChatId:",
+        },
+      ])
+      .then((answers) => {
+        Object.assign(this.inputConfig, answers);
+      });
+
+    Logger.log("✅ [👾Booter][configureTelegram()] Telegram config completed");
   }
 
   private async configWizard() {
@@ -107,13 +121,23 @@ export class Booter {
 
     if (shouldConfigureTelegram) {
       await this.configureTelegram();
+      missingFromDefualt.delete("notifier.telegram.token");
+      missingFromDefualt.delete("notifier.telegram.recipientChatId");
     }
 
-    missingFromDefualt.forEach((key) => {
-      Logger.log(
-        `🔄DEBUG [👾Booter][configWizard()] Missing config value: ${key}`
-      );
+    const prompts = [];
+    missingFromDefualt.forEach(async (key) => {
+      prompts.push({
+        name: key,
+        message: `Enter a value for ${key}:`,
+      });
     });
+
+    await inquirer.prompt(prompts).then((answers) => {
+      Object.assign(this.inputConfig, answers);
+    });
+
+    Logger.log("✅ [👾Booter][confiWizard()] Config completed");
     return;
   }
 
