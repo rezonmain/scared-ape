@@ -7,8 +7,7 @@ import type { IScraper } from "./models/Scraper.js";
 import { Cache } from "./services/cache/Cache.js";
 import { Scheduler } from "./services/scheduler/Scheduler.js";
 import { Api } from "./services/api/Api.js";
-import type { Notifier } from "./services/notifier/Notifier.js";
-import { Telegram } from "./services/notifier/Telegram.js";
+import { Telegram } from "./services/notifier/Telegram/Telegram.js";
 import { Fetcher } from "./services/Fetcher.js";
 
 /**
@@ -19,7 +18,7 @@ export class ScaredApe {
   private api: Api;
   private scheduler: Scheduler;
   private cache: Cache;
-  private notifier: Notifier;
+  private notifier: Telegram;
   private fetcher: Fetcher;
   constructor() {
     this.db = new SQLiteDB();

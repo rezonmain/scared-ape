@@ -17,8 +17,10 @@
   app: {
     bootstrapOnStartup: true,
   },
-  telegram: {
-    token: "",
+  notifier: {
+    telegram: {
+      token: "",
+    },
   },
   cache: {
     redisLab: {
