@@ -1,4 +1,4 @@
-export class FetcKey {
+export class FetchKey {
   url: string;
   method?: RequestInit["method"];
   body?: RequestInit["body"];

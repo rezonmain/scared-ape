@@ -26,10 +26,12 @@ export class Cache {
    */
   async getPrimitive(key: string): Promise<string | undefined> {
     try {
-      await this.client.connect();
       const value = await this.client.get(key);
-      Logger.log(`✅ [🌵Cache][getPrimitive()] OK -> ${Str.bound(key)}`);
-      this.client.disconnect();
+      Logger.log(
+        `✅ [🌵Cache][getPrimitive()] ${value ? "OK" : "OK-404"} -> ${Str.bound(
+          key
+        )}`
+      );
       return value;
     } catch (error) {
       Logger.error(error);
@@ -43,10 +45,10 @@ export class Cache {
    */
   async get(key: string): Promise<KeyValue | undefined> {
     try {
-      await this.client.connect();
       const value = await this.client.hGetAll(key);
-      Logger.log(`✅ [🌵Cache][get()] OK -> ${Str.bound(key)}`);
-      this.client.disconnect();
+      Logger.log(
+        `✅ [🌵Cache][get()] ${value ? "OK" : "OK-404"} -> ${Str.bound(key)}`
+      );
       return value;
     } catch (error) {
       Logger.error(error);
