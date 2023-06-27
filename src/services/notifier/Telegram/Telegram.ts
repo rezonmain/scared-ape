@@ -5,7 +5,6 @@ import { Str } from "../../../utils/Str.js";
 import { otherwise } from "../../../utils/ez.js";
 
 export class Telegram {
-  private path = "https://api.telegram.org/bot";
   private token: string;
   private bot: Bot;
   private recipientChatId: string;

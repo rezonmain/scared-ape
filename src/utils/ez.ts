@@ -29,6 +29,7 @@ export const otherwise = <T = unknown>(value: T, fallback: unknown): T => {
   if (isNothing(value)) {
     return typeof fallback === "function" ? fallback() : fallback;
   }
+  return value;
 };
 
 /**
