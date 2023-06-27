@@ -37,7 +37,7 @@ export class Booter {
     const parseMissing = (config: unknown, path: string) => {
       if (typeof config === "object") {
         for (const [key, value] of Object.entries(config)) {
-          // Get nested config values
+          // Recurse to get nested config values
           parseMissing(value, `${path}.${key}`);
         }
       } else {
