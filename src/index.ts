@@ -1,8 +1,10 @@
 import config from "config";
 import { ScaredApe } from "./ScaredApe.js";
+import { Booter } from "./utils/Booter.js";
 
-const app = new ScaredApe();
 if (config.get("app.bootOnStart")) {
-  await app.boot();
+  const booter = new Booter();
+  await booter.boot();
 }
+const app = new ScaredApe();
 app.run();
