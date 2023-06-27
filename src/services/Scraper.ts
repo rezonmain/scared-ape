@@ -5,7 +5,7 @@ import type { DB } from "./db/DB.js";
 import { CacheHelper } from "../utils/CacheHelper.js";
 import { Logger } from "../utils/Logger.js";
 import type { ScraperStatus } from "../constants/scraperStatus.js";
-import type { Notifier } from "./notifier/Notifier.js";
+import type { Telegram } from "./notifier/Telegram/Telegram.js";
 
 /*
   This is the base class for all scrapers.
@@ -17,7 +17,7 @@ export abstract class Scraper<Dto = void> {
   protected shouldNotifyChanges: boolean;
   protected status: ScraperStatus;
   protected interval: IScraper["interval"]; // In seconds
-  constructor(protected db?: DB, protected notifier?: Notifier) {}
+  constructor(protected db?: DB, protected notifier?: Telegram) {}
   abstract get name(): string;
   abstract get knownId(): string;
   abstract get associatedWidgets(): string[];
@@ -61,6 +61,13 @@ export abstract class Scraper<Dto = void> {
 
       // Update this run status
       await this.db.updateRunStatus(this.runId, "success");
+
+      // Notify the changes
+      if (this.shouldNotifyChanges) {
+        this.notifier.send(
+          `Scraper ${this.name} detected changes!, check them out at ${this.url}`
+        );
+      }
       return;
     }
     Logger.log(`✅ [${this.name}] no data change detected, skipping save`);
