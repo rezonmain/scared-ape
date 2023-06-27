@@ -63,7 +63,7 @@ export abstract class Scraper<Dto = void> {
       await this.db.updateRunStatus(this.runId, "success");
 
       // Notify the changes
-      if (this.shouldNotifyChanges) {
+      if (this.shouldNotifyChanges && this.notifier) {
         this.notifier.send(
           `Scraper ${this.name} detected changes!, check them out at ${this.url}`
         );
