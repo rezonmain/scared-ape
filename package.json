@@ -12,7 +12,7 @@
     "dev": "pnpm build:swc && (pnpm watch:swc & NODE_ENV=dev nodemon dist/index.js)",
     "pre": "pnpm lint & pnpm type-check",
     "test": "vitest run",
-    "dev:noWatch": "NODE_ENV=dev node dist/index.js",
+    "dev:now": "pnpm build:swc && NODE_ENV=dev node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf dist",

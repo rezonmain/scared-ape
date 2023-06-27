@@ -13,8 +13,13 @@ export class Telegram {
    * @returns
    */
   async getMe() {
-    return this.fetcher.get({
-      url: `${this.path}${this.token}/getMe`,
-    });
+    return this.fetcher.get(
+      {
+        url: `${this.path}${this.token}/getMe`,
+      },
+      {
+        expires: 1800,
+      }
+    );
   }
 }

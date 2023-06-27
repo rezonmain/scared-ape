@@ -23,8 +23,8 @@
     },
   },
   cache: {
-    cacheOutbound: true,
-    cacheInbound: true,
+    outbound: true,
+    indbound: true,
     redisLab: {
       password: "",
       host: "",

@@ -1,7 +1,8 @@
-import config from "config";
+import c from "config";
 import type { FetchKey } from "../types/FetchKey.js";
 import { Logger } from "../utils/Logger.js";
 import type { Cache } from "./cache/Cache.js";
+import type { FetchConfig } from "../types/FetchConfig.js";
 
 export class Fetcher {
   constructor(private cache: Cache) {}
@@ -9,8 +10,8 @@ export class Fetcher {
   private getCacheKey = (key: FetchKey): string =>
     `${key?.method ?? "get"}:${key.url}:${JSON.stringify(key.body)}`;
 
-  async fetch<T>(key: FetchKey): Promise<T> {
-    const shouldCache = config.get("chacheOutbound");
+  async fetch<T>(key: FetchKey, config: FetchConfig): Promise<T> {
+    const shouldCache = c.get("cache.outbound");
     const cacheKey = this.getCacheKey(key);
 
     if (shouldCache) {
@@ -38,7 +39,8 @@ export class Fetcher {
         ).toUpperCase()} ${new URL(key.url).origin}`
       );
       const content = await response.json();
-      shouldCache && this.cache.set(cacheKey, content, 1 * 60 * 30);
+      shouldCache &&
+        this.cache.set(cacheKey, content, config?.expires ?? undefined);
       return content;
     } catch (error) {
       if (error instanceof Response) {
@@ -53,21 +55,27 @@ export class Fetcher {
     }
   }
 
-  async get<T>(key: FetchKey): Promise<T> {
-    return await this.fetch<T>(key);
+  async get<T>(key: FetchKey, config?: FetchConfig): Promise<T> {
+    return await this.fetch<T>(key, config);
   }
 
-  async post<T>(key: FetchKey): Promise<T> {
-    return await this.fetch<T>({
-      ...key,
-      method: "post",
-    });
+  async post<T>(key: FetchKey, config: FetchConfig): Promise<T> {
+    return await this.fetch<T>(
+      {
+        ...key,
+        method: "post",
+      },
+      config
+    );
   }
 
-  async put<T>(key: FetchKey): Promise<T> {
-    return await this.fetch<T>({
-      ...key,
-      method: "put",
-    });
+  async put<T>(key: FetchKey, config: FetchConfig): Promise<T> {
+    return await this.fetch<T>(
+      {
+        ...key,
+        method: "put",
+      },
+      config
+    );
   }
 }
