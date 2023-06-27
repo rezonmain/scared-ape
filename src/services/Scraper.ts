@@ -5,21 +5,19 @@ import type { DB } from "./db/DB.js";
 import { CacheHelper } from "../utils/CacheHelper.js";
 import { Logger } from "../utils/Logger.js";
 import type { ScraperStatus } from "../constants/scraperStatus.js";
+import type { Notifier } from "./notifier/Notifier.js";
 
 /*
   This is the base class for all scrapers.
 */
 export abstract class Scraper<Dto = void> {
-  protected db: DB;
   protected runId: Run["id"];
   protected url: string;
   protected dtoValidator: z.ZodSchema<Dto>;
   protected shouldNotifyChanges: boolean;
   protected status: ScraperStatus;
   protected interval: IScraper["interval"]; // In seconds
-  constructor(db?: DB) {
-    this.db = db;
-  }
+  constructor(protected db?: DB, protected notifier?: Notifier) {}
   abstract get name(): string;
   abstract get knownId(): string;
   abstract get associatedWidgets(): string[];

@@ -1,4 +1,4 @@
-import type { Instanciable } from "../types/instanciable.js";
+import type { Instanciable } from "../types/Instanciable.js";
 
 export class ErrorHelper {
   static instanceOf<T extends Instanciable>(

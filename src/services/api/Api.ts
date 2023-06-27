@@ -3,11 +3,16 @@ import express from "express";
 import { Logger } from "../../utils/Logger.js";
 import type { DB } from "../db/DB.js";
 import type { Scheduler } from "../scheduler/Scheduler.js";
+import type { Cache } from "../cache/Cache.js";
 
 export class Api {
   private ex: express.Express;
   private port: number;
-  constructor(private db: DB, private scheduler: Scheduler) {
+  constructor(
+    private db: DB,
+    private scheduler: Scheduler,
+    private cache: Cache
+  ) {
     this.ex = express();
     this.port = config.get("api.port");
   }

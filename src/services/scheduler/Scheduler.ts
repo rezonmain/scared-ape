@@ -2,11 +2,12 @@ import { ToadScheduler, SimpleIntervalJob, AsyncTask } from "toad-scheduler";
 import { Logger } from "../../utils/Logger.js";
 import type { DB } from "../db/DB.js";
 import { ScrapersHelper } from "../../utils/ScrapersHelper.js";
+import type { Notifier } from "../notifier/Notifier.js";
 
 export class Scheduler {
   private toadScheduler: ToadScheduler;
   public jobs: SimpleIntervalJob[] = [];
-  constructor(private db: DB) {
+  constructor(private db: DB, private notifier: Notifier) {
     this.toadScheduler = new ToadScheduler();
   }
 
@@ -70,7 +71,8 @@ export class Scheduler {
       const fn = async () => {
         const scraperInstance = await ScrapersHelper.getScraperInstance(
           scraper.name,
-          this.db
+          this.db,
+          this.notifier
         );
         scraperInstance.scrape();
       };

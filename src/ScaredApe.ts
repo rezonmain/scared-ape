@@ -4,8 +4,12 @@ import { Seeder } from "./services/Seeder.js";
 import { ScrapersHelper } from "./utils/ScrapersHelper.js";
 import { Logger } from "./utils/Logger.js";
 import type { IScraper } from "./models/Scraper.js";
+import { Cache } from "./services/cache/Cache.js";
 import { Scheduler } from "./services/scheduler/Scheduler.js";
 import { Api } from "./services/api/Api.js";
+import type { Notifier } from "./services/notifier/Notifier.js";
+import { Telegram } from "./services/notifier/Telegram.js";
+import { Fetcher } from "./services/Fetcher.js";
 
 /**
  * The main app class
@@ -14,14 +18,24 @@ export class ScaredApe {
   private db: DB;
   private api: Api;
   private scheduler: Scheduler;
+  private cache: Cache;
+  private notifier: Notifier;
+  private fetcher: Fetcher;
   constructor() {
     this.db = new SQLiteDB();
-    this.scheduler = new Scheduler(this.db);
-    this.api = new Api(this.db, this.scheduler);
+    this.cache = new Cache();
+    this.fetcher = new Fetcher(this.cache);
+    this.notifier = new Telegram(this.fetcher);
+    this.scheduler = new Scheduler(this.db, this.notifier);
+    this.api = new Api(this.db, this.scheduler, this.cache);
   }
 
   private async runScraper(name: IScraper["name"]) {
-    const scraper = await ScrapersHelper.getScraperInstance(name, this.db);
+    const scraper = await ScrapersHelper.getScraperInstance(
+      name,
+      this.db,
+      this.notifier
+    );
     await scraper.scrape();
   }
 

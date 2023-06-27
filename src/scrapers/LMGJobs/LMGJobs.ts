@@ -4,13 +4,14 @@ import { Scraper } from "../../services/Scraper.js";
 import type { LMGJobsDTO } from "./LMGJobs.dto.js";
 import { LMGJobsDTOSchema } from "./LMGJobs.dto.js";
 import { Logger } from "../../utils/Logger.js";
+import type { Notifier } from "../../services/notifier/Notifier.js";
 
 /*
   Scrapes the list of jobs from the jobs page of the LMG website
 */
 export class LMGJobs extends Scraper<LMGJobsDTO> {
-  constructor(database: DB) {
-    super(database);
+  constructor(database: DB, notifier: Notifier) {
+    super(database, notifier);
     this.url = "https://linusmediagroup.com/jobs";
     this.dtoValidator = LMGJobsDTOSchema;
     this.shouldNotifyChanges = true;

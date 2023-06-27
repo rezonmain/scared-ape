@@ -3,6 +3,7 @@ import config from "config";
 import type { Scraper } from "../services/Scraper.js";
 import type { IScraper } from "../models/Scraper.js";
 import type { DB } from "../services/db/DB.js";
+import type { Notifier } from "../services/notifier/Notifier.js";
 
 export class ScrapersHelper {
   static pathname = config.get("scrapers.path") as string;
@@ -19,13 +20,14 @@ export class ScrapersHelper {
    */
   static async getScraperInstance(
     scraperName: string,
-    db?: DB
+    db?: DB,
+    notifier?: Notifier
   ): Promise<Scraper> {
     try {
       const scraper = await import(
         `../scrapers/${scraperName}/${scraperName}.js`
       );
-      return new scraper[scraperName](db);
+      return new scraper[scraperName](db, notifier);
     } catch (error) {
       throw new Error(`Scraper ${scraperName} not found, ${error}`);
     }

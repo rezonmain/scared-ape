@@ -17,4 +17,14 @@
   app: {
     bootstrapOnStartup: true,
   },
+  telegram: {
+    token: "",
+  },
+  cache: {
+    redisLab: {
+      password: "",
+      host: "",
+      port: 0,
+    },
+  },
 }
