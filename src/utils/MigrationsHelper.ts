@@ -1,6 +1,9 @@
 import fs from "fs/promises";
 import config from "config";
 
+/**
+ * Utility functions for managing migrations.
+ */
 export class MigrationsHelper {
   static async list(): Promise<string[]> {
     const pathname = config.get("database.migrations.path") as string;
