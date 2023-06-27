@@ -9,7 +9,7 @@ import { FileHelper } from "./FileHelper.js";
 import { isNothingOrZero } from "./ez.js";
 import c from "config";
 import { input } from "@inquirer/prompts";
-import type { Telegram } from "../services/notifier/Telegram/Telegram.js";
+import { Telegram } from "../services/notifier/Telegram/Telegram.js";
 
 /**
  * Automate the app bootrapping process
@@ -17,14 +17,12 @@ import type { Telegram } from "../services/notifier/Telegram/Telegram.js";
  */
 export class Booter {
   private environment: string;
-  private inputConfig: Map<string, string> = new Map();
-  constructor(
-    private db: DB,
-    private cache: Cache,
-    private telegram: Telegram,
-    environment?: string
-  ) {
+  private inputConfig: Map<string, string>;
+  private db: DB;
+  private cache: Cache;
+  constructor(environment?: string) {
     this.environment = environment ?? process.env.NODE_ENV ?? "dev";
+    this.inputConfig = new Map<string, string>();
   }
 
   get env() {
@@ -37,7 +35,7 @@ export class Booter {
     await scraper.scrape();
   }
 
-  private async getMissingConfigValues(): Promise<Set<string>> {
+  private async getMissingConfigValuesFromDefualt(): Promise<Set<string>> {
     const missing = new Set<string>();
     const config = JSON5.parse(
       await FileHelper.asString("config/default.json5")
@@ -62,10 +60,10 @@ export class Booter {
 
   private async configureTelegram() {
     const token = c.has("notifier.telegram.token")
-      ? c.get("notifier.telegram.token")
+      ? c.get<string>("notifier.telegram.token")
       : "";
     const recipientChatId = c.has("notifier.telegram.recipientChatId")
-      ? c.get("notifier.telegram.recipientChatId")
+      ? c.get<string>("notifier.telegram.recipientChatId")
       : "";
 
     if (!token) {
@@ -73,36 +71,48 @@ export class Booter {
         "➡️ [👾Booter][configureTelegram()] Bot token not found, please create a Telegram bot and enter the token below:"
       );
       this.inputConfig.set(
-        "notifier.telegram.recipientChatId",
+        "notifier.telegram.token",
         await input({
           message: "Enter a value for notifier.telegram.token:",
         })
       );
+    } else {
+      this.inputConfig.set("notifier.telegram.token", token);
     }
-    if (recipientChatId) return;
-
+    if (recipientChatId) {
+      Logger.log(
+        "✅ [👾Booter][configureTelegram()] Telegram config looks good"
+      );
+      return;
+    }
     Logger.log(
       "🔄 [👾Booter][configureTelegram()] Starting up Telegram bot with provided token... use /id to get your recipientChatId"
     );
-    this.telegram.start();
+    const gram = new Telegram(this.inputConfig.get("notifier.telegram.token"));
+    gram.start();
     this.inputConfig.set(
       "notifier.telegram.recipientChatId",
       await input({
-        message: "Enter a value for notifier.telegram.token:",
+        message: "Enter a value for notifier.telegram.recipientChatId:",
       })
     );
+    Logger.log("✅ [👾Booter][configureTelegram()] Telegram config looks good");
   }
 
   private async configWizard() {
-    const missing = await this.getMissingConfigValues();
+    const missingFromDefualt = await this.getMissingConfigValuesFromDefualt();
     const shouldConfigureTelegram =
-      missing.has("notifier.telegram.token") ||
-      missing.has("notifier.telegram.recipientChatId");
+      missingFromDefualt.has("notifier.telegram.token") ||
+      missingFromDefualt.has("notifier.telegram.recipientChatId");
 
-    if (shouldConfigureTelegram) this.configureTelegram();
+    if (shouldConfigureTelegram) {
+      await this.configureTelegram();
+    }
 
-    missing.forEach((key) => {
-      Logger.log(`🔄 [👾Booter][configWizard()] Missing config value: ${key}`);
+    missingFromDefualt.forEach((key) => {
+      Logger.log(
+        `🔄DEBUG [👾Booter][configWizard()] Missing config value: ${key}`
+      );
     });
     return;
   }
@@ -120,17 +130,18 @@ export class Booter {
   async boot() {
     Logger.log("🔄 [👾Booter][boot()] Booting scared-ape...");
     await this.configWizard();
-    await this.db.connect();
-    await this.db.migrate();
-    const seeder = new Seeder(this.db);
-    await seeder.seed();
-    // Run all the active scrapers
-    Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
-    const activeScrapers = await this.db.getActiveScrapers();
-    await Promise.all(
-      activeScrapers.map((scraper) => this.runScraper(scraper.name))
-    );
-    Logger.log("✅ [👾Booter][boot()] All active scrapers finished running.");
-    this.cache.flush();
+    process.exit(1);
+    // await this.db.connect();
+    // await this.db.migrate();
+    // const seeder = new Seeder(this.db);
+    // await seeder.seed();
+    // // Run all the active scrapers
+    // Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
+    // const activeScrapers = await this.db.getActiveScrapers();
+    // await Promise.all(
+    //   activeScrapers.map((scraper) => this.runScraper(scraper.name))
+    // );
+    // Logger.log("✅ [👾Booter][boot()] All active scrapers finished running.");
+    // this.cache.flush();
   }
 }
