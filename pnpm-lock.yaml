@@ -13,6 +13,9 @@ dependencies:
   grammy:
     specifier: ^1.17.1
     version: 1.17.1
+  json5:
+    specifier: ^2.2.3
+    version: 2.2.3
   puppeteer:
     specifier: ^20.7.3
     version: 20.7.3(typescript@5.1.3)
