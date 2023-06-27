@@ -25,6 +25,12 @@ export const isNothing = (value: unknown): boolean => {
   return false;
 };
 
+export const otherwise = <T = unknown>(value: T, fallback: unknown): T => {
+  if (isNothing(value)) {
+    return typeof fallback === "function" ? fallback() : fallback;
+  }
+};
+
 /**
  * Same as isNothing but also returns true for 0.
  * @param value
