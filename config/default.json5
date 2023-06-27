@@ -15,7 +15,7 @@
     port: 7363,
   },
   app: {
-    bootStart: true,
+    bootOnStart: true,
   },
   notifier: {
     notifyOnStart: false,
