@@ -8,9 +8,11 @@
     "start": "tsc && node dist/index.js",
     "build": "tsc",
     "bs": "pnpm build:swc && node dist/cli/bootstrap.js",
+    "bs:dev": "pnpm build:swc && NODE_ENV=dev node dist/cli/bootstrap.js",
     "dev": "pnpm build:swc && (pnpm watch:swc & NODE_ENV=dev nodemon dist/index.js)",
     "pre": "pnpm lint & pnpm type-check",
-    "dev:noWatch": "NODE=dev node dist/index.js",
+    "test": "vitest run",
+    "dev:noWatch": "NODE_ENV=dev node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf dist",
@@ -31,7 +33,8 @@
     "@typescript-eslint/parser": "^5.60.1",
     "eslint": "^8.43.0",
     "nodemon": "^2.0.22",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.3",
+    "vitest": "^0.32.2"
   },
   "dependencies": {
     "better-sqlite3": "^8.4.0",
