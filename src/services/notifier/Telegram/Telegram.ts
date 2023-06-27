@@ -17,21 +17,22 @@ export class Telegram {
 
   start() {
     Logger.log("🔄 [📪Telegram][start()] Starting Telegram bot...");
-    this.registerListeners();
+    this.registerCommands();
     this.bot.start();
     config.get("notifier.notifyOnStart") &&
       this.send("🦍 scared-ape is getting scared and is running 🦍");
   }
 
-  private registerListeners() {
-    // this.bot.on("message:text", (ctx) => {
-    //   Logger.log(
-    //     `✅ [📪Telegram][on(message:text)] recieved message: '${Str.bound(
-    //       ctx.message.text
-    //     )}, from: ${JSON.stringify(ctx, null, 2)}'`
-    //   );
-    //   ctx.reply("Echo: " + ctx.message.text);
-    // });
+  private registerCommands() {
+    this.bot.command("id", (ctx) =>
+      ctx.reply(`🦍 *Here you go:* _\`${ctx.chat.id}\`_`, {
+        parse_mode: "MarkdownV2",
+      })
+    );
+
+    this.bot.api.setMyCommands([
+      { command: "id", description: "Get the chat id" },
+    ]);
   }
 
   /**
