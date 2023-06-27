@@ -1,3 +1,8 @@
+/**
+ * Returns true for empty values, check .spec for details.
+ * @param value
+ * @returns
+ */
 export const isNothing = (value: unknown): boolean => {
   if (value === null || value === undefined) {
     return true;
@@ -15,6 +20,21 @@ export const isNothing = (value: unknown): boolean => {
     return true;
   }
   if (Array.isArray(value) && value.every((v) => isNothing(v))) {
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Same as isNothing but also returns true for 0.
+ * @param value
+ * @returns
+ */
+export const isEmptyOrZero = (value: unknown): boolean => {
+  if (isNothing(value)) {
+    return true;
+  }
+  if (typeof value === "number" && value === 0) {
     return true;
   }
   return false;
