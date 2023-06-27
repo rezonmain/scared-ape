@@ -1,3 +1,4 @@
+import config from "config";
 import type { FetchKey } from "../types/FetchKey.js";
 import { Logger } from "../utils/Logger.js";
 import type { Cache } from "./cache/Cache.js";
@@ -9,10 +10,14 @@ export class Fetcher {
     `${key?.method ?? "get"}:${key.url}:${JSON.stringify(key.body)}`;
 
   async fetch<T>(key: FetchKey): Promise<T> {
+    const shouldCache = config.get("chacheOutbound");
     const cacheKey = this.getCacheKey(key);
-    const cachedValue = await this.cache.get(cacheKey);
-    if (cachedValue) {
-      return cachedValue as T;
+
+    if (shouldCache) {
+      const cachedValue = await this.cache.get(cacheKey);
+      if (cachedValue) {
+        return cachedValue as T;
+      }
     }
 
     Logger.log(
@@ -33,7 +38,7 @@ export class Fetcher {
         ).toUpperCase()} ${new URL(key.url).origin}`
       );
       const content = await response.json();
-      this.cache.set(cacheKey, content, 1 * 60 * 30);
+      shouldCache && this.cache.set(cacheKey, content, 1 * 60 * 30);
       return content;
     } catch (error) {
       if (error instanceof Response) {
