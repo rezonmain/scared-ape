@@ -3,6 +3,7 @@ import { createClient } from "redis";
 import type { KeyValue } from "../../types/KeyValue.js";
 import { Logger } from "../../utils/Logger.js";
 import { Str } from "../../utils/Str.js";
+import { isNothing } from "../../utils/ez.js";
 
 export class Cache {
   protected client: ReturnType<typeof createClient>;
@@ -19,6 +20,17 @@ export class Cache {
     );
   }
 
+  async flush(): Promise<void> {
+    try {
+      await this.client.connect();
+      await this.client.flushAll();
+      Logger.log("✅ [🌵Cache][flush()] Cleared cache");
+      this.client.disconnect();
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   /**
    * Get a primitive value from the cache
    * @param key
@@ -26,12 +38,15 @@ export class Cache {
    */
   async getPrimitive(key: string): Promise<string | undefined> {
     try {
-      const value = await this.client.get(key);
+      await this.client.connect();
+      let value = await this.client.get(key);
+      value = isNothing(value) ? undefined : value;
       Logger.log(
-        `✅ [🌵Cache][getPrimitive()] ${value ? "OK" : "OK-404"} -> ${Str.bound(
-          key
-        )}`
+        `${value ? "✅" : "🆗"} [🌵Cache][get()] ${
+          value ? "Cache hit" : "No hit"
+        } -> ${Str.bound(key)}`
       );
+      this.client.disconnect();
       return value;
     } catch (error) {
       Logger.error(error);
@@ -43,13 +58,18 @@ export class Cache {
    * @param key
    * @returns
    */
-  async get(key: string): Promise<KeyValue | undefined> {
+  async get<T = unknown>(key: string): Promise<T | undefined> {
     try {
-      const value = await this.client.hGetAll(key);
+      await this.client.connect();
+      let value = await this.client.json.get(key);
+      value = isNothing(value) ? undefined : value;
       Logger.log(
-        `✅ [🌵Cache][get()] ${value ? "OK" : "OK-404"} -> ${Str.bound(key)}`
+        `${value ? "✅" : "🆗"} [🌵Cache][get()] ${
+          value ? "Cache hit" : "No hit"
+        } -> ${Str.bound(key)}`
       );
-      return value;
+      this.client.disconnect();
+      return value as T;
     } catch (error) {
       Logger.error(error);
     }
@@ -67,20 +87,22 @@ export class Cache {
     expires?: number
   ): Promise<void> {
     try {
+      await this.client.connect();
       if (typeof value === "string") {
         await this.client.set(key, value);
       } else {
-        await this.client.hSet(key, value);
+        await this.client.json.set(key, ".", value);
       }
-      Logger.log(`✅ [🌵Cache][set()] OK -> ${Str.bound(key)}`);
+      Logger.log(`✅ [🌵Cache][set()] Set cache -> ${Str.bound(key)}`);
       if (expires) {
         await this.client.expire(key, expires);
         Logger.log(
-          `✅ [🌵Cache][set()] Expires -> ${Str.bound(
+          `✅ [🌵Cache][set()] Set Expires -> ${Str.bound(
             key
-          )} at ${expires.toString()}`
+          )} in ${expires.toString()} seconds`
         );
       }
+      this.client.disconnect();
     } catch (error) {
       Logger.error(error);
     }

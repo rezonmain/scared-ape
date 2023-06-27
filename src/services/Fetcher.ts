@@ -1,6 +1,5 @@
 import type { FetchKey } from "../types/FetchKey.js";
 import { Logger } from "../utils/Logger.js";
-import { Str } from "../utils/Str.js";
 import type { Cache } from "./cache/Cache.js";
 
 export class Fetcher {
@@ -13,12 +12,14 @@ export class Fetcher {
     const cacheKey = this.getCacheKey(key);
     const cachedValue = await this.cache.get(cacheKey);
     if (cachedValue) {
-      Logger.log(
-        `✅ [🌮Fetcher][fetch()] Cache hit for ${Str.bound(cacheKey)}`
-      );
       return cachedValue as T;
     }
 
+    Logger.log(
+      `🔄 [🌮Fetcher][fetch()] Executing request ${(
+        key?.method ?? "get"
+      ).toUpperCase()} ${new URL(key.url).origin}`
+    );
     try {
       const response = await fetch(key.url, {
         ...key,
@@ -31,7 +32,9 @@ export class Fetcher {
           key?.method ?? "get"
         ).toUpperCase()} ${new URL(key.url).origin}`
       );
-      return await response.json();
+      const content = await response.json();
+      this.cache.set(cacheKey, content, 1 * 60 * 30);
+      return content;
     } catch (error) {
       if (error instanceof Response) {
         const content = await error.json();

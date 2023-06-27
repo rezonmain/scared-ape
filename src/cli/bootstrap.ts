@@ -1,6 +1,7 @@
 import { Seeder } from "../services/Seeder.js";
 import { SQLiteDB } from "../services/db/SQLiteDB.js";
 import { Logger } from "../utils/Logger.js";
+import { Cache } from "../services/cache/Cache.js";
 
 (async () => {
   try {
@@ -11,6 +12,8 @@ import { Logger } from "../utils/Logger.js";
     const seeder = new Seeder(db);
     await seeder.seed();
     await db.disconnect();
+    const cache = new Cache();
+    await cache.flush();
     Logger.log("✅ [👾cli/bootstrap] successfully bootrsrapped scared-ape...");
   } catch (error) {
     Logger.logAndExit(
