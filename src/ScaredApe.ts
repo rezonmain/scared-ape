@@ -27,7 +27,7 @@ export class ScaredApe {
   }
 
   async boot() {
-    const booter = new Booter(this.db, this.cache);
+    const booter = new Booter(this.db, this.cache, this.notifier);
     await booter.boot();
   }
 
