@@ -31,7 +31,9 @@ export class Booter {
     return missingConfigValues;
   }
 
-  private async configWizard() {}
+  private async configWizard() {
+    return;
+  }
 
   /**
    * Boot the app.
