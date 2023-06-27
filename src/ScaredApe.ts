@@ -5,7 +5,6 @@ import { Scheduler } from "./services/scheduler/Scheduler.js";
 import { Api } from "./services/api/Api.js";
 import { Telegram } from "./services/notifier/Telegram/Telegram.js";
 import { Fetcher } from "./services/Fetcher.js";
-import { Booter } from "./utils/Booter.js";
 
 /**
  * The main app class
@@ -21,14 +20,9 @@ export class ScaredApe {
     this.db = new SQLiteDB();
     this.cache = new Cache();
     this.fetcher = new Fetcher(this.cache);
-    this.notifier = new Telegram(this.fetcher);
+    this.notifier = new Telegram();
     this.scheduler = new Scheduler(this.db, this.notifier);
     this.api = new Api(this.db, this.scheduler, this.cache);
-  }
-
-  async boot() {
-    const booter = new Booter(this.db, this.cache, this.notifier);
-    await booter.boot();
   }
 
   /**
