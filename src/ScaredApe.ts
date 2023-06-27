@@ -64,12 +64,13 @@ export class ScaredApe {
    * Run the app
    * - Connect to the database
    * - Start the scheduler
+   * - Start the notifier
    * - Start the api
    */
   async run() {
     this.db.connect();
     this.scheduler.start();
-    await this.notifier.getMe();
+    this.notifier.start();
     this.api.start();
   }
 }

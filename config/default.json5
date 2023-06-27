@@ -18,8 +18,11 @@
     bootstrapOnStartup: true,
   },
   notifier: {
+    notifyOnStart: false,
     telegram: {
+      botUsername: "",
       token: "",
+      recipientChatId: "",
     },
   },
   cache: {
