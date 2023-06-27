@@ -4,6 +4,9 @@ import { Seeder } from "../services/Seeder.js";
 import { Logger } from "./Logger.js";
 import { ScrapersHelper } from "./ScrapersHelper.js";
 import type { IScraper } from "../models/Scraper.js";
+import JSON5 from "json5";
+import { FileHelper } from "./FileHelper.js";
+import { isNothingOrZero } from "./ez.js";
 
 /**
  * Automate the app bootrapping process
@@ -25,13 +28,34 @@ export class Booter {
     await scraper.scrape();
   }
 
-  private getMissingConfigValues(): Map<string, string> {
-    const missingConfigValues = new Map<string, string>();
+  private async getMissingConfigValues(): Promise<Set<string>> {
+    const missing = new Set<string>();
+    const config = JSON5.parse(
+      await FileHelper.asString("config/default.json5")
+    );
 
-    return missingConfigValues;
+    const parseMissing = (config: unknown, path: string) => {
+      if (typeof config === "object") {
+        for (const [key, value] of Object.entries(config)) {
+          // Get nested config values
+          parseMissing(value, `${path}.${key}`);
+        }
+      } else {
+        // If we reached this it means it's a leaf node with a primitive value
+        if (isNothingOrZero(config)) {
+          missing.add(path);
+        }
+      }
+    };
+    parseMissing(config, "");
+    return missing;
   }
 
   private async configWizard() {
+    const missing = await this.getMissingConfigValues();
+    missing.forEach((key) => {
+      Logger.log(`🔄 [👾Booter][configWizard()] Missing config value: ${key}`);
+    });
     return;
   }
 
