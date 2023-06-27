@@ -23,6 +23,11 @@ export class Telegram {
       this.send("🦍 scared-ape is getting scared and is running 🦍");
   }
 
+  stop() {
+    Logger.log("🔄 [📪Telegram][stop()] Stopping Telegram bot...");
+    this.bot.stop();
+  }
+
   private registerCommands() {
     this.bot.command("id", (ctx) =>
       ctx.reply(`🦍 *Here you go:* _\`${ctx.chat.id}\`_`, {
