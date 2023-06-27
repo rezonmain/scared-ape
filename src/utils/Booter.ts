@@ -7,6 +7,9 @@ import type { IScraper } from "../models/Scraper.js";
 import JSON5 from "json5";
 import { FileHelper } from "./FileHelper.js";
 import { isNothingOrZero } from "./ez.js";
+import c from "config";
+import { input } from "@inquirer/prompts";
+import type { Telegram } from "../services/notifier/Telegram/Telegram.js";
 
 /**
  * Automate the app bootrapping process
@@ -14,7 +17,13 @@ import { isNothingOrZero } from "./ez.js";
  */
 export class Booter {
   private environment: string;
-  constructor(private db: DB, private cache: Cache, environment?: string) {
+  private inputConfig: Map<string, string> = new Map();
+  constructor(
+    private db: DB,
+    private cache: Cache,
+    private telegram: Telegram,
+    environment?: string
+  ) {
     this.environment = environment ?? process.env.NODE_ENV ?? "dev";
   }
 
@@ -43,7 +52,7 @@ export class Booter {
       } else {
         // If we reached this it means it's a leaf node with a primitive value
         if (isNothingOrZero(config)) {
-          missing.add(path);
+          missing.add(path.slice(1));
         }
       }
     };
@@ -51,8 +60,47 @@ export class Booter {
     return missing;
   }
 
+  private async configureTelegram() {
+    const token = c.has("notifier.telegram.token")
+      ? c.get("notifier.telegram.token")
+      : "";
+    const recipientChatId = c.has("notifier.telegram.recipientChatId")
+      ? c.get("notifier.telegram.recipientChatId")
+      : "";
+
+    if (!token) {
+      Logger.log(
+        "➡️ [👾Booter][configureTelegram()] Bot token not found, please create a Telegram bot and enter the token below:"
+      );
+      this.inputConfig.set(
+        "notifier.telegram.recipientChatId",
+        await input({
+          message: "Enter a value for notifier.telegram.token:",
+        })
+      );
+    }
+    if (recipientChatId) return;
+
+    Logger.log(
+      "🔄 [👾Booter][configureTelegram()] Starting up Telegram bot with provided token... use /id to get your recipientChatId"
+    );
+    this.telegram.start();
+    this.inputConfig.set(
+      "notifier.telegram.recipientChatId",
+      await input({
+        message: "Enter a value for notifier.telegram.token:",
+      })
+    );
+  }
+
   private async configWizard() {
     const missing = await this.getMissingConfigValues();
+    const shouldConfigureTelegram =
+      missing.has("notifier.telegram.token") ||
+      missing.has("notifier.telegram.recipientChatId");
+
+    if (shouldConfigureTelegram) this.configureTelegram();
+
     missing.forEach((key) => {
       Logger.log(`🔄 [👾Booter][configWizard()] Missing config value: ${key}`);
     });
