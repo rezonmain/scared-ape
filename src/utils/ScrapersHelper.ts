@@ -5,6 +5,9 @@ import type { IScraper } from "../models/Scraper.js";
 import type { DB } from "../services/db/DB.js";
 import type { Notifier } from "../services/notifier/Notifier.js";
 
+/**
+ * Utility functions for managing, creating scrapers.
+ */
 export class ScrapersHelper {
   static pathname = config.get("scrapers.path") as string;
 
