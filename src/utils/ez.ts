@@ -30,7 +30,7 @@ export const isNothing = (value: unknown): boolean => {
  * @param value
  * @returns
  */
-export const isEmptyOrZero = (value: unknown): boolean => {
+export const isNothingOrZero = (value: unknown): boolean => {
   if (isNothing(value)) {
     return true;
   }
