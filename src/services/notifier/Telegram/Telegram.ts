@@ -1,17 +1,19 @@
 import { Bot } from "grammy";
-import type { Fetcher } from "../../Fetcher.js";
 import config from "config";
 import { Logger } from "../../../utils/Logger.js";
 import { Str } from "../../../utils/Str.js";
+import { otherwise } from "../../../utils/ez.js";
 
 export class Telegram {
   private path = "https://api.telegram.org/bot";
   private token: string;
   private bot: Bot;
   private recipientChatId: string;
-  constructor(private fetcher: Fetcher) {
-    this.token = config.get("notifier.telegram.token");
-    this.recipientChatId = config.get("notifier.telegram.recipientChatId");
+  constructor(token?: string, recipientChatId?: string) {
+    this.token = otherwise(token, () => config.get("notifier.telegram.token"));
+    this.recipientChatId = otherwise(recipientChatId, () =>
+      config.get("notifier.telegram.recipientChatId")
+    );
     this.bot = new Bot(this.token);
   }
 
@@ -50,20 +52,5 @@ export class Telegram {
       `📪 [📪Telegram][send()] Sending message: '${Str.bound(message)}'`
     );
     await this.bot.api.sendMessage(chatId ?? this.recipientChatId, message);
-  }
-
-  /**
-   * Used for testing
-   * @returns
-   */
-  async getMe() {
-    return this.fetcher.get(
-      {
-        url: `${this.path}${this.token}/getMe`,
-      },
-      {
-        expires: 1800,
-      }
-    );
   }
 }
