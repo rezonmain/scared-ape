@@ -120,16 +120,12 @@ export class Booter {
       .then((answers) => {
         _.merge(this.inputConfig, answers);
       });
-
+    await gram.stop();
     Logger.log("✅ [👾Booter][configureTelegram()] Telegram config completed");
   }
 
   private async configWizard() {
     const missingFromDefualt = await this.getMissingConfigValuesFromDefualt();
-    Logger.log(
-      "➡️  [👾Booter][configWizard()] missing config:",
-      missingFromDefualt
-    );
     const shouldConfigureTelegram =
       missingFromDefualt.has("notifier.telegram.token") ||
       missingFromDefualt.has("notifier.telegram.recipientChatId");

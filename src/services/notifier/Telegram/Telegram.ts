@@ -24,9 +24,9 @@ export class Telegram {
       this.send("🦍 scared-ape is getting scared and is running 🦍");
   }
 
-  stop() {
+  async stop() {
     Logger.log("🔄 [📪Telegram][stop()] Stopping Telegram bot...");
-    this.bot.stop();
+    await this.bot.stop();
   }
 
   private registerCommands() {
