@@ -1,5 +1,4 @@
 import type { DB } from "../services/db/DB.js";
-import { Cache } from "../services/cache/Cache.js";
 import { Seeder } from "../services/Seeder.js";
 import { Logger } from "./Logger.js";
 import { ScrapersHelper } from "./ScrapersHelper.js";
@@ -22,10 +21,8 @@ export class Booter {
   private inputConfig: object;
   private defaultConfig: object;
   private db: DB;
-  private cache: Cache;
   constructor(environment?: string) {
     this.db = new SQLiteDB();
-    this.cache = new Cache();
     this.environment = environment ?? process.env.NODE_ENV ?? "dev";
     this.inputConfig = {};
   }
@@ -41,12 +38,13 @@ export class Booter {
   }
 
   private async saveConfigFile() {
-    const path = `config/${this.env}.json5`;
+    const path = `config/local-${this.env}.json5`;
     Logger.log(
       `🔄 [👾Booter][saveConfigFile()] saving configuration file to ${path}...`
     );
     const config = _.merge(this.defaultConfig, this.inputConfig);
     await FileHelper.write(path, config);
+    await c.util.loadFileConfigs(`${this.env}.json5`);
   }
 
   private async getMissingConfigValuesFromDefualt(): Promise<Set<string>> {
@@ -82,7 +80,7 @@ export class Booter {
 
     if (!token) {
       Logger.log(
-        "➡️ [👾Booter][configureTelegram()] Bot token not found, please create a Telegram bot and enter the token below:"
+        "➡️  [👾Booter][configureTelegram()] Bot token not found, please create a Telegram bot and enter the token below:"
       );
       await inquirer
         .prompt([
@@ -128,6 +126,10 @@ export class Booter {
 
   private async configWizard() {
     const missingFromDefualt = await this.getMissingConfigValuesFromDefualt();
+    Logger.log(
+      "➡️  [👾Booter][configWizard()] missing config:",
+      missingFromDefualt
+    );
     const shouldConfigureTelegram =
       missingFromDefualt.has("notifier.telegram.token") ||
       missingFromDefualt.has("notifier.telegram.recipientChatId");
@@ -183,7 +185,6 @@ export class Booter {
       );
       Logger.log("✅ [👾Booter][boot()] All active scrapers finished running.");
     }
-    await this.cache.flush();
     Logger.log("✅ [👾Booter][boot()] Successfully booted scared-ape.");
   }
 }
