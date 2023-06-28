@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "tsc && node NODE_ENV=prod dist/index.js",
+    "start": "tsc && node dist/index.js",
     "build": "tsc",
-    "boot": "pnpm build:swc && NODE_ENV=prod node dist/cli/boot.js",
+    "boot": "pnpm build:swc && node dist/cli/boot.js",
     "boot:dev": "pnpm build:swc && NODE_ENV=dev node dist/cli/boot.js",
     "dev:watch": "pnpm build:swc && (pnpm watch:swc & NODE_ENV=dev nodemon dist/index.js)",
     "pre": "pnpm lint & pnpm type-check",
