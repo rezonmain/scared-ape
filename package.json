@@ -15,7 +15,7 @@
     "dev": "pnpm build:swc && NODE_ENV=dev node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist config/local-* config/*dev*",
     "lint:fix": "eslint . --ext .ts --fix",
     "build:swc": "swc src -d dist",
     "watch:swc": "swc src -d dist -w"
