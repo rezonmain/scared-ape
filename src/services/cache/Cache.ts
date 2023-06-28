@@ -11,8 +11,8 @@ export class Cache {
     this.client = createClient({
       password: config.get("cache.redisLab.password"),
       socket: {
-        host: config.get("cache.redisLab.host"),
-        port: config.get("cache.redisLab.port"),
+        host: config.get("cache.redisLab.socket.host"),
+        port: config.get("cache.redisLab.socket.port"),
       },
     });
     this.client.on("error", (err) =>
