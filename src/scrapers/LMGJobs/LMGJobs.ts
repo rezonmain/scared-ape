@@ -43,6 +43,9 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
 
       // Wait for the jobs list to load
       await page.waitForSelector(".accordion-items-container");
+
+      // Set screen size
+      await page.setViewport({ width: 700, height: 1400 });
       screenshot = await page.screenshot();
 
       // Get the jobs list <ul> element
