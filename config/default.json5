@@ -29,8 +29,13 @@
     indbound: true,
     redisLab: {
       password: "",
-      host: "",
-      port: 0,
+      socket: {
+        host: "",
+        port: 0,
+      },
     },
+  },
+  logger: {
+    trace: false,
   },
 }

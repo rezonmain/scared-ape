@@ -1,4 +1,15 @@
+import c from "config";
+
 export class Logger {
+  static trace(): string {
+    if (!c.get("logger.trace")) return "";
+    const stack = new Error().stack.split("\n");
+    return stack[2].substring(
+      stack[2].indexOf("("),
+      stack[2].lastIndexOf(")") + 1
+    );
+  }
+
   static logAndThrow(...error: unknown[]): void {
     console.error(error);
     throw error;
@@ -13,7 +24,7 @@ export class Logger {
     console.error(...error);
   }
 
-  static log(...message: string[]): void {
-    console.log(...message);
+  static log(...message: unknown[]): void {
+    console.log(...message, this.trace());
   }
 }
