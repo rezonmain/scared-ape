@@ -1,5 +1,5 @@
 import type { DB } from "../services/db/DB.js";
-import type { Cache } from "../services/cache/Cache.js";
+import { Cache } from "../services/cache/Cache.js";
 import { Seeder } from "../services/Seeder.js";
 import { Logger } from "./Logger.js";
 import { ScrapersHelper } from "./ScrapersHelper.js";
@@ -11,6 +11,7 @@ import c from "config";
 import { Telegram } from "../services/notifier/Telegram/Telegram.js";
 import inquirer from "inquirer";
 import _ from "lodash";
+import { SQLiteDB } from "../services/db/SQLiteDB.js";
 
 /**
  * Automate the app bootrapping process
@@ -19,9 +20,12 @@ import _ from "lodash";
 export class Booter {
   private environment: string;
   private inputConfig: object;
+  private defaultConfig: object;
   private db: DB;
   private cache: Cache;
   constructor(environment?: string) {
+    this.db = new SQLiteDB();
+    this.cache = new Cache();
     this.environment = environment ?? process.env.NODE_ENV ?? "dev";
     this.inputConfig = {};
   }
@@ -36,10 +40,19 @@ export class Booter {
     await scraper.scrape();
   }
 
+  private async saveConfigFile() {
+    const path = `config/${this.env}.json5`;
+    Logger.log(
+      `🔄 [👾Booter][saveConfigFile()] saving configuration file to ${path}...`
+    );
+    const config = _.merge(this.defaultConfig, this.inputConfig);
+    await FileHelper.write(path, config);
+  }
+
   private async getMissingConfigValuesFromDefualt(): Promise<Set<string>> {
     const missing = new Set<string>();
-    const config = JSON5.parse(
-      await FileHelper.asString("config/default.json5")
+    this.defaultConfig = JSON5.parse(
+      await FileHelper.readAsString("config/default.json5")
     );
 
     const parseMissing = (config: unknown, path: string) => {
@@ -55,7 +68,7 @@ export class Booter {
         }
       }
     };
-    parseMissing(config, "");
+    parseMissing(this.defaultConfig, "");
     return missing;
   }
 
@@ -79,10 +92,10 @@ export class Booter {
           },
         ])
         .then((answers) => {
-          Object.assign(this.inputConfig, answers);
+          _.merge(this.inputConfig, answers);
         });
     } else {
-      Object.assign(this.inputConfig, { notfier: { telegram: token } });
+      _.merge(this.inputConfig, { notfier: { telegram: token } });
     }
 
     if (recipientChatId) {
@@ -102,12 +115,12 @@ export class Booter {
     await inquirer
       .prompt([
         {
-          name: "notifier.telegram.token",
+          name: "notifier.telegram.recipientChatId",
           message: "Enter a value for notifier.telegram.recipientChatId:",
         },
       ])
       .then((answers) => {
-        Object.assign(this.inputConfig, answers);
+        _.merge(this.inputConfig, answers);
       });
 
     Logger.log("✅ [👾Booter][configureTelegram()] Telegram config completed");
@@ -127,17 +140,20 @@ export class Booter {
 
     const prompts = [];
     missingFromDefualt.forEach(async (key) => {
-      prompts.push({
-        name: key,
-        message: `Enter a value for ${key}:`,
-      });
+      if (!c.has(key) || isNothingOrZero(c.get(key))) {
+        prompts.push({
+          name: key,
+          message: `Enter a value for ${key}:`,
+        });
+      }
     });
 
     await inquirer.prompt(prompts).then((answers) => {
-      Object.assign(this.inputConfig, answers);
+      _.merge(this.inputConfig, answers);
     });
 
-    Logger.log("✅ [👾Booter][confiWizard()] Config completed");
+    prompts.length > 0 && (await this.saveConfigFile());
+    Logger.log("✅ [👾Booter][configWizard()] configuration completed.");
     return;
   }
 
@@ -151,21 +167,23 @@ export class Booter {
    * - Seeding database
    * - Initial data scrape run
    */
-  async boot() {
+  async boot(opts: { initialScrape: boolean } = { initialScrape: true }) {
     Logger.log("🔄 [👾Booter][boot()] Booting scared-ape...");
     await this.configWizard();
-    process.exit(1);
-    // await this.db.connect();
-    // await this.db.migrate();
-    // const seeder = new Seeder(this.db);
-    // await seeder.seed();
-    // // Run all the active scrapers
-    // Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
-    // const activeScrapers = await this.db.getActiveScrapers();
-    // await Promise.all(
-    //   activeScrapers.map((scraper) => this.runScraper(scraper.name))
-    // );
-    // Logger.log("✅ [👾Booter][boot()] All active scrapers finished running.");
-    // this.cache.flush();
+    await this.db.connect();
+    await this.db.migrate();
+    const seeder = new Seeder(this.db);
+    await seeder.seed();
+    if (opts.initialScrape) {
+      // Run all the active scrapers
+      Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
+      const activeScrapers = await this.db.getActiveScrapers();
+      await Promise.all(
+        activeScrapers.map((scraper) => this.runScraper(scraper.name))
+      );
+      Logger.log("✅ [👾Booter][boot()] All active scrapers finished running.");
+    }
+    await this.cache.flush();
+    Logger.log("✅ [👾Booter][boot()] Successfully booted scared-ape.");
   }
 }
