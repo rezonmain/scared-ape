@@ -84,7 +84,7 @@ export class Cache {
   async set(
     key: string,
     value: string | KeyValue,
-    expires?: number
+    expires: number
   ): Promise<void> {
     try {
       await this.client.connect();
