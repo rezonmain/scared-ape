@@ -1,4 +1,12 @@
 FROM node:18-alpine
+RUN apk add --no-cache \
+  chromium \
+  nss \
+  freetype \
+  harfbuzz \
+  ca-certificates \
+  ttf-freefont 
+
 WORKDIR /app
 RUN npm install -g pnpm
 COPY package.json ./
