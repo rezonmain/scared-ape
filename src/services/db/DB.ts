@@ -5,6 +5,7 @@ import type { IScraper } from "../../models/Scraper.js";
 import type { Screenshot } from "../../models/Screenshot.js";
 import config from "config";
 import type { User } from "../../models/User.js";
+import type { Paginated, PaginationOpt } from "../../utils/Pagination.js";
 
 /**
  * The database service, this is the interface that all database services should implement.
@@ -60,9 +61,23 @@ export abstract class DB {
   abstract getAllScrapers(): Promise<IScraper[]>;
 
   /**
+   * Paginated list of all registered scrapers
+   */
+  abstract pgGetAllScrapers(
+    pagination: PaginationOpt
+  ): Promise<Paginated<IScraper>>;
+
+  /**
    * Get active scrapers
    */
   abstract getActiveScrapers(): Promise<IScraper[]>;
+
+  /**
+   * Paginated list of active scrapers
+   */
+  abstract pgActiveScrapers(
+    pagination: PaginationOpt
+  ): Promise<Paginated<IScraper>>;
 
   /**
    * Completly removes a scraper from the database.
@@ -160,6 +175,14 @@ export abstract class DB {
    * @param runId
    */
   abstract getLatestRun(scraperKnownId: IScraper["knownId"]): Promise<Run>;
+
+  /**
+   * Get a paginated list of runs for a scraper
+   */
+  abstract pgGetRunsForScraper(
+    scraperKnownId: IScraper["knownId"],
+    opt: PaginationOpt
+  ): Promise<Paginated<Run>>;
 
   /**
    * Update the status of a scrape run.
