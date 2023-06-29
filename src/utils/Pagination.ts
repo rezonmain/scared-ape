@@ -54,4 +54,6 @@ export class Pagination implements IPagination {
   get totalRecords(): number {
     return this.totalRows;
   }
+
+  static defaultLimit = 10;
 }
