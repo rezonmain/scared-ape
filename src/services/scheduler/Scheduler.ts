@@ -24,9 +24,6 @@ export class Scheduler {
     name: string;
     interval: number;
   }): void {
-    Logger.log(
-      `🔄 [🦎Scheduler][addSimpleJob()] Adding job: ${name} with interval: ${interval} seconds`
-    );
     const task = new AsyncTask(name, fn);
     const job = new SimpleIntervalJob({ seconds: interval }, task, {
       id: name,
