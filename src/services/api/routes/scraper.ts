@@ -6,13 +6,8 @@ const scraperRouter = Router();
 /**
  * List all scrapers
  * @route GET /scraper
- * @queryparam {boolean} [active] - Filter by active status
  */
 scraperRouter.get("/", async (req, res) => {
-  if (req.query.active) {
-    const activeScrapers = await req.ctx.db.getActiveScrapers();
-    res.json(activeScrapers);
-  }
   const scrapers = await req.ctx.db.getAllScrapers();
   res.json(scrapers);
 });
