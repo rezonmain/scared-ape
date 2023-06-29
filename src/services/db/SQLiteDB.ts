@@ -326,8 +326,6 @@ export class SQLiteDB extends DB {
         .prepare(query)
         .all(scraper.id, opt.limit, opt.offset * opt.limit) as Run[];
 
-      console.log("DEBUG", list);
-
       Logger.log(
         `✅ [💾SQLite ${
           this.name
