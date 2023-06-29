@@ -76,7 +76,7 @@ export class Scheduler {
 
       this.addJob({
         fn,
-        name: scraper.name,
+        name: scraper.knownId,
         interval: scraper.interval,
       });
     });
