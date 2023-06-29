@@ -8,6 +8,11 @@ import { DB } from "./DB.js";
 import Database from "better-sqlite3";
 import type { User } from "../../models/User.js";
 import { Logger } from "../../utils/Logger.js";
+import {
+  Pagination,
+  type Paginated,
+  type PaginationOpt,
+} from "../../utils/Pagination.js";
 
 export class SQLiteDB extends DB {
   private db: Database.Database;
@@ -156,6 +161,10 @@ export class SQLiteDB extends DB {
     }
   }
 
+  pgGetAllScrapers(pagination: PaginationOpt): Promise<Paginated<IScraper>> {
+    throw new Error("Method not implemented.");
+  }
+
   async getActiveScrapers(): Promise<IScraper[]> {
     const query = "SELECT * FROM scraper WHERE status = 'active'";
     try {
@@ -167,6 +176,10 @@ export class SQLiteDB extends DB {
     } catch (error) {
       Logger.error(error);
     }
+  }
+
+  pgActiveScrapers(pagination: PaginationOpt): Promise<Paginated<IScraper>> {
+    throw new Error("Method not implemented.");
   }
 
   async retireScraper(knownId: IScraper["knownId"]): Promise<void> {
@@ -299,6 +312,39 @@ export class SQLiteDB extends DB {
 
   getLatestRun(scraperKnownId: IScraper["knownId"]): Promise<Run> {
     throw new Error("Method not implemented");
+  }
+
+  async pgGetRunsForScraper(
+    scraperKnownId: string,
+    opt: PaginationOpt
+  ): Promise<Paginated<Run>> {
+    let query =
+      "SELECT * FROM run WHERE scraperId = ? ORDER BY id DESC LIMIT ? OFFSET ?";
+    try {
+      const scraper = await this.getScraperbyKnownId(scraperKnownId);
+      const list = this.db
+        .prepare(query)
+        .all(scraper.id, opt.limit, opt.offset) as Run[];
+
+      Logger.log(
+        `✅ [💾SQLite ${
+          this.name
+        }][pgGetRunsForScraper()] Query -> ${query} with ${Object.values(
+          opt
+        ).join(",")}`
+      );
+
+      query = "SELECT COUNT(*) FROM run WHERE scraperId = ?";
+
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][pgGetRunsForScraper()] Query -> ${query} with ${scraper.id}`
+      );
+      const total = this.db.prepare(query).get(scraper.id) as number;
+      const pagination = new Pagination(opt.limit, opt.offset, total);
+      return { list, pagination };
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 
   async updateRunStatus(
