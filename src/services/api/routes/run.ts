@@ -2,7 +2,7 @@ import { Router } from "express";
 import { isNothing, otherwise, unsafeCoerce } from "../../../utils/ez.js";
 import { Pagination } from "../../../utils/Pagination.js";
 
-const router = Router();
+const runRouter = Router();
 
 /**
  * Get a list of latest runs
@@ -10,7 +10,7 @@ const router = Router();
  * @queryparam ...
  * @paginated
  */
-router.get("/", async (req, res) => {
+runRouter.get("/", async (req, res) => {
   res.status(418).send(["not", "implemented"]);
 });
 
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
  * Get a list of runs for a scraper via scraper knownId
  * @paginated
  */
-router.get("/:scraperKnownId", async (req, res) => {
+runRouter.get("/:scraperKnownId", async (req, res) => {
   const limit = otherwise(req.query.limit, Pagination.defaultLimit);
   const page = otherwise(req.query.page, 1);
   const runs = await req.ctx.db.pgGetRunsForScraper(req.params.scraperKnownId, {
@@ -31,3 +31,5 @@ router.get("/:scraperKnownId", async (req, res) => {
   }
   res.json(runs);
 });
+
+export { runRouter };

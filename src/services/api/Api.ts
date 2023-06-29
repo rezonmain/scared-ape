@@ -1,9 +1,12 @@
 import config from "config";
 import express from "express";
-import { Logger } from "../../utils/Logger.js";
 import type { DB } from "../db/DB.js";
 import type { Scheduler } from "../scheduler/Scheduler.js";
 import type { Cache } from "../cache/Cache.js";
+import { Logger } from "../../utils/Logger.js";
+import { scraperRouter } from "./routes/scraper.js";
+import { runRouter } from "./routes/run.js";
+import { jobRouter } from "./routes/job.js";
 
 export class Api {
   private ex: express.Express;
@@ -18,27 +21,21 @@ export class Api {
   }
 
   start() {
+    // Attach services to the request context
+    this.ex.use(async (req) => {
+      req.ctx = {
+        db: this.db,
+        scheduler: this.scheduler,
+        cache: this.cache,
+      };
+    });
+
+    this.ex.use("/scraper", scraperRouter);
+    this.ex.use("/run", runRouter);
+    this.ex.use("/job", jobRouter);
+
     this.ex.get("/", async (req, res) => {
       res.send("Hello World!");
-    });
-
-    this.ex.get("/scrapers", async (req, res) => {
-      const activeScrapers = await this.db.getActiveScrapers();
-      res.send(JSON.stringify(activeScrapers, null, 2));
-    });
-
-    this.ex.get("/jobs", async (req, res) => {
-      const jobs = this.scheduler.jobs;
-      res.send(
-        JSON.stringify(
-          jobs.map((j) => ({
-            name: j.id,
-            status: j.getStatus(),
-          })),
-          null,
-          2
-        )
-      );
     });
 
     this.ex.listen(this.port, () => {

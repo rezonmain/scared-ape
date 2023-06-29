@@ -17,3 +17,5 @@ jobRouter.get("/", async (req, res) => {
     }))
   );
 });
+
+export { jobRouter };
