@@ -20,10 +20,10 @@ runRouter.get("/", async (req, res) => {
  */
 runRouter.get("/:scraperKnownId", async (req, res) => {
   const limit = otherwise(req.query.limit, Pagination.defaultLimit);
-  const page = otherwise(req.query.page, 1);
+  const page = otherwise(req.query.page, 0);
   const runs = await req.ctx.db.pgGetRunsForScraper(req.params.scraperKnownId, {
     limit: unsafeCoerce<number>(limit),
-    offset: unsafeCoerce<number>(page),
+    offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
   });
   if (isNothing(runs)) {
     res.status(404).send("No runs found");

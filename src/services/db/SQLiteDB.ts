@@ -324,7 +324,9 @@ export class SQLiteDB extends DB {
       const scraper = await this.getScraperbyKnownId(scraperKnownId);
       const list = this.db
         .prepare(query)
-        .all(scraper.id, opt.limit, opt.offset) as Run[];
+        .all(scraper.id, opt.limit, opt.offset * opt.limit) as Run[];
+
+      console.log("DEBUG", list);
 
       Logger.log(
         `✅ [💾SQLite ${
@@ -335,12 +337,16 @@ export class SQLiteDB extends DB {
       );
 
       query = "SELECT COUNT(*) FROM run WHERE scraperId = ?";
-
       Logger.log(
         `✅ [💾SQLite ${this.name}][pgGetRunsForScraper()] Query -> ${query} with ${scraper.id}`
       );
-      const total = this.db.prepare(query).get(scraper.id) as number;
-      const pagination = new Pagination(opt.limit, opt.offset, total);
+
+      const total = this.db.prepare(query).get(scraper.id)["COUNT(*)"];
+      const pagination = new Pagination(
+        opt.limit,
+        opt.offset,
+        total
+      ).getPagination();
       return { list, pagination };
     } catch (error) {
       Logger.error(error);

@@ -5,7 +5,7 @@ export type PaginationOpt = {
 
 export type Paginated<T> = {
   list: T[];
-  pagination: Pagination;
+  pagination: IPagination;
 };
 
 interface IPagination {
