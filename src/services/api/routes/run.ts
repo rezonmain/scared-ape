@@ -26,7 +26,7 @@ runRouter.get("/:scraperKnownId", async (req, res) => {
     offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
   });
   if (isNothing(runs)) {
-    res.status(404).send("No runs found");
+    res.status(404).send("No runs found for the provided scraper knownId");
     return;
   }
   res.json(runs);
