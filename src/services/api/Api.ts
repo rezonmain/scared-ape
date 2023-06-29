@@ -22,12 +22,13 @@ export class Api {
 
   start() {
     // Attach services to the request context
-    this.ex.use(async (req) => {
+    this.ex.use((req, _, next) => {
       req.ctx = {
         db: this.db,
         scheduler: this.scheduler,
         cache: this.cache,
       };
+      next();
     });
 
     this.ex.use("/scraper", scraperRouter);
