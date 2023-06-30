@@ -94,11 +94,18 @@ authRouter.post("/challenge/:challenge", async (req, res) => {
   // At this point user is authenticated
   // Generate session
   const { fgp, jwt } = req.ctx.auth.generateSession(verified.cuid);
-  res.cookie("__Secure-Fgp", fgp, {
+  res.cookie("__Secure-fgp", fgp, {
     httpOnly: true,
     secure: true,
     sameSite: "strict",
   });
-  return res.json({ jwt });
+
+  res.cookie("__Secure-jwt", jwt, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+
+  return res.sendStatus(200);
 });
 export { authRouter };
