@@ -1,7 +1,7 @@
 import type { Entity } from "./Entity.js";
 
-export interface Token extends Entity {
+export interface Challenge extends Entity {
   userId: number | bigint;
-  token: string;
+  challenge: string;
   expiresAt: Date;
 }
