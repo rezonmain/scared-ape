@@ -1,11 +1,12 @@
 import type { AccessRequest } from "../../models/AccessRequest.js";
 import type { Json } from "../../models/Json.js";
 import type { Run } from "../../models/Run.js";
+import Database from "better-sqlite3";
+import { createId } from "@paralleldrive/cuid2";
 import type { IScraper } from "../../models/Scraper.js";
 import type { Screenshot } from "../../models/Screenshot.js";
 import { MigrationsHelper } from "../../utils/MigrationsHelper.js";
 import { DB } from "./DB.js";
-import Database from "better-sqlite3";
 import type { User } from "../../models/User.js";
 import { Logger } from "../../utils/Logger.js";
 import {
@@ -368,9 +369,11 @@ export class SQLiteDB extends DB {
   }
 
   async saveUser(user: User): Promise<void> {
-    const query = "INSERT INTO user (email, role) VALUES (@email, @role)";
+    const query =
+      "INSERT INTO user (email, role, cuid) VALUES (@email, @role, @cuid)";
     try {
-      this.db.prepare(query).run(user);
+      const cuid = createId();
+      this.db.prepare(query).run({ ...user, cuid });
       Logger.log(
         `✅ [💾SQLite ${this.name}][saveUser()] Query -> ${query} with ${user.email}, ${user.role}`
       );
