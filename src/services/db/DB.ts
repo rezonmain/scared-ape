@@ -7,6 +7,7 @@ import config from "config";
 import type { User } from "../../models/User.js";
 import type { Paginated, PaginationOpt } from "../../utils/Pagination.js";
 import { Service } from "../Service.js";
+import type { Token } from "../../models/Token.js";
 
 /**
  * The database service, this is the interface that all database services should implement.
@@ -210,6 +211,12 @@ export abstract class DB extends Service {
   abstract getUser(email: User["email"]): Promise<User | undefined>;
 
   /**
+   * Get one user by id
+   * @param id
+   */
+  abstract getUserById(id: User["id"]): Promise<User | undefined>;
+
+  /**
    * Save an access request to the database.
    * @param email
    */
@@ -230,6 +237,18 @@ export abstract class DB extends Service {
    * Hard delete an access request from the database
    */
   abstract deleteAccessRequest(email: AccessRequest["email"]): Promise<void>;
+
+  /**
+   * Save a challenge token to the database.
+   * @param token
+   */
+  abstract saveToken(token: Token): Promise<void>;
+
+  /**
+   * Get a challenge token from the database.
+   * @param token
+   */
+  abstract getToken(token: Token["token"]): Promise<Token | undefined>;
 }
 
 /**
