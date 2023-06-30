@@ -1,4 +1,4 @@
 export type Session = {
-  fgpCookie: string;
+  fgp: string;
   jwt: string;
 };
