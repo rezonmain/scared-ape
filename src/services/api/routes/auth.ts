@@ -6,9 +6,7 @@ import { Auth } from "../../auth/Auth.js";
 
 const authRouter = Router();
 
-/**
- * Handle authentication
- */
+// Route to handle authentication
 
 /**
  * Generate challenge token if user is whitelisted
@@ -106,6 +104,6 @@ authRouter.post("/challenge/:challenge", async (req, res) => {
     sameSite: "strict",
   });
 
-  return res.sendStatus(200);
+  return res.status(200).json({ user: verified });
 });
 export { authRouter };
