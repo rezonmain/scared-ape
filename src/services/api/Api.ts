@@ -7,8 +7,9 @@ import { Logger } from "../../utils/Logger.js";
 import { scraperRouter } from "./routes/scraper.js";
 import { runRouter } from "./routes/run.js";
 import { jobRouter } from "./routes/job.js";
+import { Service } from "../Service.js";
 
-export class Api {
+export class Api extends Service {
   private ex: express.Express;
   private port: number;
   constructor(
@@ -16,6 +17,7 @@ export class Api {
     private scheduler: Scheduler,
     private cache: Cache
   ) {
+    super();
     this.ex = express();
     this.port = config.get("api.port");
   }
@@ -42,5 +44,6 @@ export class Api {
     this.ex.listen(this.port, () => {
       Logger.log(`✅ [🚀Api][start()] Listening on port ${this.port}`);
     });
+    this.running = true;
   }
 }
