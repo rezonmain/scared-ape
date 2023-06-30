@@ -3,7 +3,7 @@ import { z } from "zod";
 import { isNothing } from "../../../utils/ez.js";
 import type { User } from "../../../models/User.js";
 import { Auth } from "../../auth/Auth.js";
-import { UserDto } from "../dto/auth.dto.js";
+import { ChallengeSentDto, UserDto } from "../dto/auth.dto.js";
 
 const authRouter = Router();
 
@@ -66,7 +66,8 @@ authRouter.post("/:email", async (req, res) => {
 
   // Send challenge token to user's email
   req.ctx.mailer.sendChallengeEmail(email, challengeToken);
-  return res.sendStatus(200);
+  const json = new ChallengeSentDto({ email });
+  return res.json(json);
 });
 
 /**

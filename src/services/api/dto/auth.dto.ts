@@ -1,4 +1,7 @@
 import type { User } from "../../../models/User.js";
+interface IChallengeSent {
+  email: string;
+}
 
 class UserDto implements User {
   constructor(private opts: User) {}
@@ -19,4 +22,11 @@ class UserDto implements User {
   }
 }
 
-export { UserDto };
+class ChallengeSentDto implements IChallengeSent {
+  constructor(private opts: IChallengeSent) {}
+  get email() {
+    return this.opts.email;
+  }
+}
+
+export { UserDto, ChallengeSentDto };
