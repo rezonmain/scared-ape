@@ -3,9 +3,10 @@ import config from "config";
 import { Logger } from "../../../utils/Logger.js";
 import { Str } from "../../../utils/Str.js";
 import { otherwise } from "../../../utils/ez.js";
-import { Service } from "../../Service.js";
+import { Notifier } from "../Notifier.js";
+import type { Peta } from "../../Peta.js";
 
-export class Telegram extends Service {
+export class Telegram extends Notifier {
   private token: string;
   private bot: Bot;
   private recipientChatId: string;
@@ -59,5 +60,11 @@ export class Telegram extends Service {
 
   get name() {
     return "telegram";
+  }
+
+  async sendHealthCheck(peta: Peta): Promise<void> {
+    await this.send(
+      `🦍 health check: ${JSON.stringify(peta.getHealth(), null, 2)}`
+    );
   }
 }
