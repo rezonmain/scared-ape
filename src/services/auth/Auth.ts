@@ -3,46 +3,86 @@ import { isNothing } from "../../utils/ez.js";
 import { Logger } from "../../utils/Logger.js";
 import { init } from "@paralleldrive/cuid2";
 import jwt from "jsonwebtoken";
+import type { DB } from "../db/DB.js";
+import type { User } from "../../models/User.js";
+import { CacheHelper } from "../../utils/CacheHelper.js";
+import type { Session } from "../../types/Session.js";
 
 export class Auth {
   private secret: string;
-  private generateId: () => string;
-  constructor() {
+  private generateChallengeId: () => string;
+  private generateSessionUserFingerprint: () => string;
+
+  constructor(private db: DB) {
     this.secret = c.get("auth.jwt.secret");
     if (isNothing(this.secret)) {
       Logger.error("Auth: secret is not defined in config file");
       process.exit(1);
     }
-    this.generateId = init({
+    this.generateChallengeId = init({
       length: 16,
     });
-  }
 
-  private generateChallengeToken(): string {
-    return this.generateId();
-  }
-
-  generateAccessToken(email: string): string {
-    return jwt.sign(email, this.secret, {
-      expiresIn: Auth.sessionLifetime,
+    this.generateSessionUserFingerprint = init({
+      length: 50,
     });
   }
 
-  generateRefreshToken(email: string): string {
-    return jwt.sign(email, this.secret, {
-      expiresIn: Auth.refreshLifetime,
-    });
+  generateChallengeToken(): string {
+    return this.generateChallengeId();
   }
 
-  verify(token: string): boolean {
+  verifyJWT(token: string, fgp: string): boolean {
+    const hashedFingerprint = CacheHelper.hashData(fgp);
     try {
-      jwt.verify(token, this.secret);
+      const decoded = jwt.verify(token, this.secret, { issuer: "ape" });
+      if (typeof decoded !== "object") return false;
+      if (decoded.fgp !== hashedFingerprint) return false;
       return true;
     } catch {
       return false;
     }
   }
 
+  async verifyChallenge(challengeToken: string): Promise<false | User> {
+    let user: User;
+    try {
+      const challenge = await this.db.getChallenge(challengeToken);
+      console.log("DEBUG", challenge);
+      if (isNothing(challenge)) return false;
+      if (new Date(challenge.expiresAt) < new Date()) return false;
+      user = await this.db.getUserById(challenge.userId);
+      if (isNothing(user)) return false;
+      if (!user.whitelist) return false;
+    } catch {
+      return false;
+    }
+    return user;
+  }
+
+  generateSession(userCuid: User["cuid"]): Session {
+    const fgp = this.generateSessionUserFingerprint();
+    const hashedFgp = CacheHelper.hashData(fgp);
+
+    const j = jwt.sign(
+      {
+        cuid: userCuid,
+        fgp: hashedFgp,
+      },
+      this.secret,
+      {
+        expiresIn: Auth.sessionLifetime,
+        issuer: "ape",
+      }
+    );
+
+    return {
+      fgp,
+      jwt: j,
+    };
+  }
+
+  static challengeLifetime = 1 * 60 * 5; // 5 minutes
   static sessionLifetime = "1h";
   static refreshLifetime = "1d";
 }
