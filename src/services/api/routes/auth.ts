@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isNothing } from "../../../utils/ez.js";
 import type { User } from "../../../models/User.js";
 import { Auth } from "../../auth/Auth.js";
+import { UserDto } from "./auth.dto.js";
 
 const authRouter = Router();
 
@@ -108,6 +109,7 @@ authRouter.post("/challenge/:challenge", async (req, res) => {
     sameSite: "strict",
   });
 
-  return res.status(200).json({ user: verified });
+  const json = new UserDto(verified);
+  return res.status(200).json(json);
 });
 export { authRouter };

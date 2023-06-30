@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticated } from "../auth.middleware.js";
+import { JobDto } from "./job.dto.js";
 
 const jobRouter = Router();
 
@@ -13,12 +14,10 @@ jobRouter.use(authenticated);
  */
 jobRouter.get("/", async (req, res) => {
   const jobs = req.ctx.scheduler.jobs;
-  return res.json(
-    jobs.map((j) => ({
-      name: j.id,
-      status: j.getStatus(),
-    }))
+  const json = jobs.map(
+    (j) => new JobDto({ name: j.id, status: j.getStatus() })
   );
+  return res.json(json);
 });
 
 export { jobRouter };

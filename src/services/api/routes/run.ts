@@ -32,7 +32,7 @@ runRouter.get("/:scraperKnownId", async (req, res) => {
       .status(404)
       .send("No runs found for the provided scraper knownId");
   }
-  res.json(runs);
+  return res.json(runs);
 });
 
 export { runRouter };
