@@ -2,6 +2,7 @@ import c from "config";
 import { isNothing } from "../../utils/ez.js";
 import { Logger } from "../../utils/Logger.js";
 import { init } from "@paralleldrive/cuid2";
+import jwt from "jsonwebtoken";
 
 export class Auth {
   private secret: string;
@@ -17,7 +18,27 @@ export class Auth {
     });
   }
 
-  generateChallengeToken(): string {
+  private generateChallengeToken(): string {
     return this.generateId();
   }
+
+  generateAccessToken(email: string): string {
+    return jwt.sign(email, this.secret, {
+      expiresIn: Auth.sessionLifetime,
+    });
+  }
+
+  generateRefreshToken(email: string): string {
+    return jwt.sign(email, this.secret, {
+      expiresIn: Auth.refreshLifetime,
+    });
+  }
+
+  sendChallengeEmail(email: string): string {
+    console.log("sendChallengeEmail", email);
+    return "not implemented";
+  }
+
+  static sessionLifetime = "1h";
+  static refreshLifetime = "1d";
 }
