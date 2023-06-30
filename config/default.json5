@@ -1,4 +1,5 @@
 {
+  clientUrl: "",
   database: {
     name: "scared-ape",
     migrations: {
@@ -41,6 +42,11 @@
   auth: {
     jwt: {
       secret: "",
+    },
+  },
+  mailer: {
+    courier: {
+      apiKey: "",
     },
   },
 }
