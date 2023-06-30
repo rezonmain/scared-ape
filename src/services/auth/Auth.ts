@@ -32,10 +32,10 @@ export class Auth {
     return this.generateChallengeId();
   }
 
-  verifyJWT(token: string, fgp: string): boolean {
+  verifyJWT({ jwt: _jwt, fgp }: Session): boolean {
     const hashedFingerprint = CacheHelper.hashData(fgp);
     try {
-      const decoded = jwt.verify(token, this.secret, { issuer: "ape" });
+      const decoded = jwt.verify(_jwt, this.secret, { issuer: "ape" });
       if (typeof decoded !== "object") return false;
       if (decoded.fgp !== hashedFingerprint) return false;
       return true;
