@@ -1,5 +1,8 @@
 {
   clientUrl: "",
+  instance: {
+    name: "local",
+  },
   database: {
     name: "scared-ape",
     migrations: {

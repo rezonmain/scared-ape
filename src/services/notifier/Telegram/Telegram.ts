@@ -5,6 +5,7 @@ import { Str } from "../../../utils/Str.js";
 import { otherwise } from "../../../utils/ez.js";
 import { Notifier } from "../Notifier.js";
 import type { Peta } from "../../Peta.js";
+import c from "config";
 
 export class Telegram extends Notifier {
   private token: string;
@@ -51,11 +52,17 @@ export class Telegram extends Notifier {
    * @param message
    * @param chatId - optional defualts to the recipientChatId in the config
    */
-  async send(message: string, chatId?: number | string) {
+  async send(message: string, chatId?: number | string, silent = false) {
     Logger.log(
       `📪 [📪Telegram][send()] Sending message: '${Str.bound(message)}'`
     );
-    await this.bot.api.sendMessage(chatId ?? this.recipientChatId, message);
+    await this.bot.api.sendMessage(
+      chatId ?? this.recipientChatId,
+      `[${c.get("instance.name")}] ${message}`,
+      {
+        disable_notification: silent,
+      }
+    );
   }
 
   get name() {
