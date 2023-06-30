@@ -57,7 +57,10 @@ export abstract class Scraper<Dto = void> {
       });
 
       // Save the screenshot
-      await this.saveScreenshot(screenshot);
+      /**
+       * TODO: Uncomment this when the screenshot feature is ready
+       */
+      // await this.saveScreenshot(screenshot);
 
       // Update this run status
       await this.db.updateRunStatus(this.runId, "success");
