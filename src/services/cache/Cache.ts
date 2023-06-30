@@ -4,10 +4,12 @@ import type { KeyValue } from "../../types/KeyValue.js";
 import { Logger } from "../../utils/Logger.js";
 import { Str } from "../../utils/Str.js";
 import { isNothing } from "../../utils/ez.js";
+import { Service } from "../Service.js";
 
-export class Cache {
+export class Cache extends Service {
   protected client: ReturnType<typeof createClient>;
   constructor() {
+    super();
     this.client = createClient({
       password: config.get("cache.redisLab.password"),
       socket: {
@@ -15,6 +17,7 @@ export class Cache {
         port: config.get("cache.redisLab.socket.port"),
       },
     });
+    this.running = true;
     this.client.on("error", (err) =>
       Logger.log("❌ [🌵Cache] Redis Client Error", err)
     );
