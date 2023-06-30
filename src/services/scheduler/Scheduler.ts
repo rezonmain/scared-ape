@@ -4,11 +4,12 @@ import type { DB } from "../db/DB.js";
 import { ScrapersHelper } from "../../utils/ScrapersHelper.js";
 import type { Notifier } from "../notifier/Notifier.js";
 import { Service } from "../Service.js";
+import { Peta } from "../Peta.js";
 
 export class Scheduler extends Service {
   private toadScheduler: ToadScheduler;
   public jobs: SimpleIntervalJob[] = [];
-  constructor(private db: DB, private notifier: Notifier) {
+  constructor(private db: DB, private notifier: Notifier, private peta: Peta) {
     super();
     this.toadScheduler = new ToadScheduler();
   }
@@ -82,6 +83,15 @@ export class Scheduler extends Service {
         interval: scraper.interval,
       });
       this.running = true;
+    });
+
+    /**
+     * Register health check job
+     */
+    this.addJob({
+      fn: async () => await this.notifier.sendHealthCheck(this.peta),
+      name: "health-check",
+      interval: Peta.healthCheckInterval,
     });
   }
 
