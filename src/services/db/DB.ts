@@ -6,13 +6,15 @@ import type { Screenshot } from "../../models/Screenshot.js";
 import config from "config";
 import type { User } from "../../models/User.js";
 import type { Paginated, PaginationOpt } from "../../utils/Pagination.js";
+import { Service } from "../Service.js";
 
 /**
  * The database service, this is the interface that all database services should implement.
  */
-export abstract class DB {
+export abstract class DB extends Service {
   readonly name: string;
   constructor() {
+    super();
     this.name = config.get("database.name");
   }
   /**

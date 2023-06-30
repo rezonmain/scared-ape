@@ -28,6 +28,7 @@ export class SQLiteDB extends DB {
     } catch (error) {
       Logger.error(error);
     }
+    this.running = true;
   }
 
   async migrate(): Promise<void> {
