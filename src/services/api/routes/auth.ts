@@ -68,6 +68,10 @@ authRouter.post("/:email", async (req, res) => {
   return res.sendStatus(200);
 });
 
+/**
+ * Verify challenge token and generate session
+ * @Dto User
+ */
 authRouter.post("/challenge/:challenge", async (req, res) => {
   const unsafeChallengeToken = req.params.challenge;
   let challengeToken: string;
