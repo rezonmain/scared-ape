@@ -20,5 +20,5 @@ export class Peta {
     return this.services.filter((service) => service.running);
   }
 
-  static healthCheckInterval = 1000 * 60 * 30; // 30 minutes
+  static healthCheckInterval = 1 * 60 * 30; // 30 minutes
 }
