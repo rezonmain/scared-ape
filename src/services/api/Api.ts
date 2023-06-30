@@ -8,6 +8,8 @@ import { scraperRouter } from "./routes/scraper.js";
 import { runRouter } from "./routes/run.js";
 import { jobRouter } from "./routes/job.js";
 import { Service } from "../Service.js";
+import type { Mailer } from "../mailer/Mailer.js";
+import type { Auth } from "../auth/Auth.js";
 
 export class Api extends Service {
   private ex: express.Express;
@@ -15,7 +17,9 @@ export class Api extends Service {
   constructor(
     private db: DB,
     private scheduler: Scheduler,
-    private cache: Cache
+    private cache: Cache,
+    private mailer: Mailer,
+    private auth: Auth
   ) {
     super();
     this.ex = express();
@@ -29,6 +33,8 @@ export class Api extends Service {
         db: this.db,
         scheduler: this.scheduler,
         cache: this.cache,
+        mailer: this.mailer,
+        auth: this.auth,
       };
       next();
     });
