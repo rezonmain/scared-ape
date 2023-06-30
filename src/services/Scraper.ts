@@ -67,9 +67,9 @@ export abstract class Scraper<Dto = void> {
 
       // Notify the changes
       if (this.shouldNotifyChanges && this.notifier) {
-        this.notifier.send(
-          `Scraper ${this.name} detected changes!, check them out at ${this.url}`
-        );
+        this.notifier.send({
+          message: `Scraper ${this.name} detected changes!, check them out at ${this.url}`,
+        });
       }
       return;
     }
