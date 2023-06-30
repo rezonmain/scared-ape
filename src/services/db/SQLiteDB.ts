@@ -14,6 +14,7 @@ import {
   type Paginated,
   type PaginationOpt,
 } from "../../utils/Pagination.js";
+import type { Token } from "../../models/Token.js";
 
 export class SQLiteDB extends DB {
   private db: Database.Database;
@@ -370,10 +371,12 @@ export class SQLiteDB extends DB {
 
   async saveUser(user: User): Promise<void> {
     const query =
-      "INSERT INTO user (email, role, cuid) VALUES (@email, @role, @cuid)";
+      "INSERT INTO user (email, role, cuid) VALUES (@email, @role, @cuid, @whitelist)";
     try {
       const cuid = createId();
-      this.db.prepare(query).run({ ...user, cuid });
+      this.db
+        .prepare(query)
+        .run({ ...user, cuid, whitelist: user.whitelist ? 1 : 0 });
       Logger.log(
         `✅ [💾SQLite ${this.name}][saveUser()] Query -> ${query} with ${user.email}, ${user.role}`
       );
@@ -395,6 +398,19 @@ export class SQLiteDB extends DB {
     }
   }
 
+  async getUserById(id: User["id"]): Promise<User | undefined> {
+    const query = "SELECT * FROM user WHERE id = ?";
+    try {
+      const user = this.db.prepare(query).get(id);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][getUserById()] Query -> ${query} with ${id}`
+      );
+      return user ? (user as User) : undefined;
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   saveAccessRequest(email: AccessRequest["email"]): Promise<void> {
     throw new Error("Method not implemented");
   }
@@ -408,5 +424,31 @@ export class SQLiteDB extends DB {
 
   deleteAccessRequest(email: AccessRequest["email"]): Promise<void> {
     throw new Error("Method not implemented");
+  }
+
+  async saveToken(token: Token): Promise<void> {
+    const query =
+      "INSERT INTO token (token, userId, expiresAt) VALUES (@token, @userId, @expiresAt)";
+    try {
+      this.db.prepare(query).run(token);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][saveToken()] Query -> ${query} with - ${token.userId}, ${token.expiresAt}`
+      );
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async getToken(challenge: Token["token"]): Promise<Token | undefined> {
+    const query = "SELECT * FROM token WHERE token = ?";
+    try {
+      const token = this.db.prepare(query).get(challenge);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][getToken()] Query -> ${query} with -`
+      );
+      return token ? (token as Token) : undefined;
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 }
