@@ -6,11 +6,14 @@ const authenticated = (
   res: typeof response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization;
-  if (isNothingOrZero(token)) {
+  const fgp = req.cookies?.["__Secure-fgp"] ?? null;
+  const jwt = req.cookies?.["__Secure-jwt"] ?? null;
+
+  if (isNothingOrZero(fgp) || isNothingOrZero(jwt)) {
     return res.status(401).send("Unauthenticated");
   }
-  if (req.ctx.auth.verify(token)) {
+
+  if (req.ctx.auth.verifyJWT({ jwt, fgp })) {
     next();
   } else {
     return res.status(403).send("Forbidden");
