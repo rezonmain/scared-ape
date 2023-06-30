@@ -46,4 +46,8 @@ export class Api extends Service {
     });
     this.running = true;
   }
+
+  get name() {
+    return "express-api";
+  }
 }

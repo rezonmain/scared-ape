@@ -110,4 +110,8 @@ export class Cache extends Service {
       Logger.error(error);
     }
   }
+
+  get name() {
+    return "redis-cache";
+  }
 }

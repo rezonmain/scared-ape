@@ -90,4 +90,8 @@ export class Scheduler extends Service {
     this.toadScheduler.stop();
     this.running = false;
   }
+
+  get name() {
+    return "scheduler";
+  }
 }

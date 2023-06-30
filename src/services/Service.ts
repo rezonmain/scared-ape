@@ -6,4 +6,5 @@ export abstract class Service {
   constructor() {
     this.running = false;
   }
+  abstract get name(): string;
 }

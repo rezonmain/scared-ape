@@ -56,4 +56,8 @@ export class Telegram extends Service {
     );
     await this.bot.api.sendMessage(chatId ?? this.recipientChatId, message);
   }
+
+  get name() {
+    return "telegram";
+  }
 }
