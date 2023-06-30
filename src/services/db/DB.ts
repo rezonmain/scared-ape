@@ -249,7 +249,7 @@ export abstract class DB extends Service {
    * @param token
    */
   abstract getChallenge(
-    token: Challenge["challenge"]
+    challengeToken: Challenge["challenge"]
   ): Promise<Challenge | undefined>;
 }
 
