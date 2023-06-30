@@ -38,4 +38,9 @@
   logger: {
     trace: false,
   },
+  auth: {
+    jwt: {
+      secret: "",
+    },
+  },
 }
