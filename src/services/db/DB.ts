@@ -201,7 +201,7 @@ export abstract class DB extends Service {
    * Save a user to the database.
    * @param user
    */
-  abstract saveUser(user: User): Promise<void>;
+  abstract saveUser(user: Omit<User, "cuid">): Promise<void>;
 
   /**
    * Get one user by email
