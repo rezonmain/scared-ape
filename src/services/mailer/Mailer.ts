@@ -10,14 +10,14 @@ export class Mailer {
     });
   }
 
-  async sendChallengeEmail(email: string, challenge: string): Promise<void> {
+  async sendChallengeEmail(email: string, challenge: string): Promise<string> {
     if (process.env.NODE_ENV === "dev") {
       Logger.log(
         `✅ [💌Mailer]: would've send challenge email to ${email} with challenge ${challenge} but app is running in dev`
       );
       return;
     }
-    await this.client.send({
+    const { requestId } = await this.client.send({
       message: {
         to: {
           data: {
@@ -36,6 +36,9 @@ export class Mailer {
         },
       },
     });
-    Logger.log(`✅ [💌Mailer]: sent challenge email to ${email}`);
+    Logger.log(
+      `✅ [💌Mailer]: sent challenge email to ${email}, requestId: ${requestId}`
+    );
+    return requestId;
   }
 }
