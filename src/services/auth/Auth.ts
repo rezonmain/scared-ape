@@ -34,9 +34,13 @@ export class Auth {
     });
   }
 
-  sendChallengeEmail(email: string): string {
-    console.log("sendChallengeEmail", email);
-    return "not implemented";
+  verify(token: string): boolean {
+    try {
+      jwt.verify(token, this.secret);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   static sessionLifetime = "1h";
