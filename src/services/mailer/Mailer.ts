@@ -11,6 +11,12 @@ export class Mailer {
   }
 
   async sendChallengeEmail(email: string, challenge: string): Promise<void> {
+    if (process.env.NODE_ENV === "dev") {
+      Logger.log(
+        `✅ [💌Mailer]: would've send challenge email to ${email} with challenge ${challenge} but app is running in dev`
+      );
+      return;
+    }
     await this.client.send({
       message: {
         to: {
