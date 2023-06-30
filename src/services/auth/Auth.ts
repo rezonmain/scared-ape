@@ -48,7 +48,6 @@ export class Auth {
     let user: User;
     try {
       const challenge = await this.db.getChallenge(challengeToken);
-      console.log("DEBUG", challenge);
       if (isNothing(challenge)) return false;
       if (new Date(challenge.expiresAt) < new Date()) return false;
       user = await this.db.getUserById(challenge.userId);
