@@ -369,16 +369,16 @@ export class SQLiteDB extends DB {
     }
   }
 
-  async saveUser(user: User): Promise<void> {
+  async saveUser({ email, role, whitelist }: User): Promise<void> {
     const query =
-      "INSERT INTO user (email, role, cuid) VALUES (@email, @role, @cuid, @whitelist)";
+      "INSERT INTO user (email, role, cuid, whitelist) VALUES (@email, @role, @cuid, @whitelist)";
     try {
       const cuid = createId();
       this.db
         .prepare(query)
-        .run({ ...user, cuid, whitelist: user.whitelist ? 1 : 0 });
+        .run({ email, role, cuid, whitelist: whitelist ? 1 : 0 });
       Logger.log(
-        `✅ [💾SQLite ${this.name}][saveUser()] Query -> ${query} with ${user.email}, ${user.role}`
+        `✅ [💾SQLite ${this.name}][saveUser()] Query -> ${query} with ${email}, ${role}, ${whitelist}`
       );
     } catch (error) {
       Logger.error(error);
@@ -428,7 +428,7 @@ export class SQLiteDB extends DB {
 
   async saveChallenge(challenge: Challenge): Promise<void> {
     const query =
-      "INSERT INTO token (token, userId, expiresAt) VALUES (@challenge, @userId, @expiresAt)";
+      "INSERT INTO challenge (challenge, userId, expiresAt) VALUES (@challenge, @userId, @expiresAt)";
     try {
       this.db.prepare(query).run(challenge);
       Logger.log(
@@ -442,11 +442,11 @@ export class SQLiteDB extends DB {
   async getChallenge(
     challengeToken: Challenge["challenge"]
   ): Promise<Challenge | undefined> {
-    const query = "SELECT * FROM token WHERE token = ?";
+    const query = "SELECT * FROM challenge WHERE challenge = ?";
     try {
       const challenge = this.db.prepare(query).get(challengeToken);
       Logger.log(
-        `✅ [💾SQLite ${this.name}][getToken()] Query -> ${query} with -`
+        `✅ [💾SQLite ${this.name}][getChallenge()] Query -> ${query} with -`
       );
       return challenge ? (challenge as Challenge) : undefined;
     } catch (error) {
