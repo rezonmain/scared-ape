@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { isNothing, otherwise, unsafeCoerce } from "../../../utils/ez.js";
 import { Pagination } from "../../../utils/Pagination.js";
+import { authenticated } from "../auth.middleware.js";
 
 const runRouter = Router();
+runRouter.use(authenticated);
 
 /**
  * Get a list of latest runs

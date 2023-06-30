@@ -1,6 +1,9 @@
 import { Router } from "express";
+import { authenticated } from "../auth.middleware.js";
 
 const jobRouter = Router();
+
+jobRouter.use(authenticated);
 
 /**
  * Get all the registered jobs

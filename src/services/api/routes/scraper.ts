@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { isNothing } from "../../../utils/ez.js";
+import { authenticated } from "../auth.middleware.js";
 
 const scraperRouter = Router();
+scraperRouter.use(authenticated);
 
 /**
  * List all scrapers
