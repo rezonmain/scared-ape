@@ -1,0 +1,2 @@
+ALTER TABLE user ADD COLUMN cuid TEXT NOT NULL DEFAULT '';
+PRAGMA user_version = 3;
