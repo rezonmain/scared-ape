@@ -23,7 +23,7 @@ export class Seeder {
       Logger.log("✅ [🌱Seeder] pyro user already exists in database");
       return;
     }
-    this.db.saveUser({ email, role: "pyro" });
+    this.db.saveUser({ email, role: "pyro", whitelist: true });
   }
 
   private async registerScrapers() {
