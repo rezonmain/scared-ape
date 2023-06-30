@@ -5,6 +5,7 @@ import { Scheduler } from "./services/scheduler/Scheduler.js";
 import { Api } from "./services/api/Api.js";
 import { Telegram } from "./services/notifier/Telegram/Telegram.js";
 import { Fetcher } from "./services/Fetcher.js";
+import { Peta } from "./services/Peta.js";
 
 /**
  * The main app class
@@ -16,13 +17,15 @@ export class ScaredApe {
   private cache: Cache;
   private notifier: Telegram;
   private fetcher: Fetcher;
+  private peta: Peta;
   constructor() {
     this.db = new SQLiteDB();
     this.cache = new Cache();
     this.fetcher = new Fetcher(this.cache);
     this.notifier = new Telegram();
-    this.scheduler = new Scheduler(this.db, this.notifier);
     this.api = new Api(this.db, this.scheduler, this.cache);
+    this.peta = new Peta(this.db, this.api, this.cache, this.notifier);
+    this.scheduler = new Scheduler(this.db, this.notifier, this.peta);
   }
 
   /**
