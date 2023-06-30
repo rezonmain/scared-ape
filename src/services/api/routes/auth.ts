@@ -50,7 +50,9 @@ authRouter.post("/:email", async (req, res) => {
     await req.ctx.db.saveChallenge({
       userId: user.id,
       challenge: challengeToken,
-      expiresAt: new Date(Date.now() + Auth.challengeLifetime),
+      expiresAt: new Date(
+        Date.now() + Auth.challengeLifetime * 1000
+      ).toISOString(),
     });
   } catch (error) {
     return res.status(500).json({
@@ -86,8 +88,12 @@ authRouter.post("/challenge/:challenge", async (req, res) => {
 
   // At this point user is authenticated
   // Generate session
-  const { fgpCookie, jwt } = req.ctx.auth.generateSession(verified.cuid);
-  res.cookie("fgp", fgpCookie);
+  const { fgp, jwt } = req.ctx.auth.generateSession(verified.cuid);
+  res.cookie("__Secure-Fgp", fgp, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
   return res.json({ jwt });
 });
 export { authRouter };
