@@ -25,7 +25,9 @@ export class Telegram extends Notifier {
     this.registerCommands();
     this.bot.start();
     config.get("notifier.notifyOnStart") &&
-      this.send("🦍 scared-ape is getting scared and is running 🦍");
+      this.send({
+        message: "🦍 scared-ape is getting scared and is running 🦍",
+      });
     this.running = true;
   }
 
@@ -52,7 +54,15 @@ export class Telegram extends Notifier {
    * @param message
    * @param chatId - optional defualts to the recipientChatId in the config
    */
-  async send(message: string, chatId?: number | string, silent = false) {
+  async send({
+    message,
+    chatId,
+    silent = false,
+  }: {
+    message: string;
+    chatId?: number | string;
+    silent?: boolean;
+  }) {
     Logger.log(
       `📪 [📪Telegram][send()] Sending message: '${Str.bound(message)}'`
     );
@@ -70,8 +80,9 @@ export class Telegram extends Notifier {
   }
 
   async sendHealthCheck(peta: Peta): Promise<void> {
-    await this.send(
-      `🦍 health check: ${JSON.stringify(peta.getHealth(), null, 2)}`
-    );
+    await this.send({
+      message: `🦍 health check: ${JSON.stringify(peta.getHealth(), null, 2)}`,
+      silent: true,
+    });
   }
 }
