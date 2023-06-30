@@ -13,7 +13,7 @@ jobRouter.use(authenticated);
  */
 jobRouter.get("/", async (req, res) => {
   const jobs = req.ctx.scheduler.jobs;
-  res.json(
+  return res.json(
     jobs.map((j) => ({
       name: j.id,
       status: j.getStatus(),

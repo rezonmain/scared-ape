@@ -20,8 +20,7 @@ scraperRouter.get("/", async (req, res) => {
 scraperRouter.get("/:knownId", async (req, res) => {
   const scraper = await req.ctx.db.getScraperbyKnownId(req.params.knownId);
   if (isNothing(scraper)) {
-    res.status(404).send("Scraper not found");
-    return;
+    return res.status(404).send("Scraper not found");
   }
   res.json(scraper);
 });

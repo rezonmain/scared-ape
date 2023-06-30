@@ -8,12 +8,12 @@ const authenticated = (
 ) => {
   const token = req.headers.authorization;
   if (isNothingOrZero(token)) {
-    res.status(401).send("Unauthenticated");
+    return res.status(401).send("Unauthenticated");
   }
   if (req.ctx.auth.verify(token)) {
     next();
   } else {
-    res.status(403).send("Forbidden");
+    return res.status(403).send("Forbidden");
   }
 };
 

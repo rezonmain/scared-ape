@@ -13,7 +13,7 @@ runRouter.use(authenticated);
  * @paginated
  */
 runRouter.get("/", async (req, res) => {
-  res.status(418).send(["not", "implemented"]);
+  return res.status(418).send(["not", "implemented"]);
 });
 
 /**
@@ -28,8 +28,9 @@ runRouter.get("/:scraperKnownId", async (req, res) => {
     offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
   });
   if (isNothing(runs)) {
-    res.status(404).send("No runs found for the provided scraper knownId");
-    return;
+    return res
+      .status(404)
+      .send("No runs found for the provided scraper knownId");
   }
   res.json(runs);
 });
