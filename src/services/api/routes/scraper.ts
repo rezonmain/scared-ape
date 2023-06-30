@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { isNothing } from "../../../utils/ez.js";
 import { authenticated } from "../auth.middleware.js";
-import { ScraperDto } from "./scraper.dto.js";
+import { ScraperDto } from "../dto/scraper.dto.js";
 
 const scraperRouter = Router();
 scraperRouter.use(authenticated);

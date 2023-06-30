@@ -3,7 +3,7 @@ import { z } from "zod";
 import { isNothing } from "../../../utils/ez.js";
 import type { User } from "../../../models/User.js";
 import { Auth } from "../../auth/Auth.js";
-import { UserDto } from "./auth.dto.js";
+import { UserDto } from "../dto/auth.dto.js";
 
 const authRouter = Router();
 

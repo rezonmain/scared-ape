@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticated } from "../auth.middleware.js";
-import { JobDto } from "./job.dto.js";
+import { JobDto } from "../dto/job.dto.js";
 
 const jobRouter = Router();
 

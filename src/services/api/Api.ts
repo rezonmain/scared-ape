@@ -11,7 +11,7 @@ import { Service } from "../Service.js";
 import type { Mailer } from "../mailer/Mailer.js";
 import type { Auth } from "../auth/Auth.js";
 import { authRouter } from "./routes/auth.js";
-import { HomeDto } from "./api.dto.js";
+import { HomeDto } from "./dto/api.dto.js";
 
 export class Api extends Service {
   private ex: express.Express;
@@ -46,7 +46,7 @@ export class Api extends Service {
     this.ex.use("/job", jobRouter);
     this.ex.use("/auth", authRouter);
 
-    this.ex.get("/", async (req, res) => {
+    this.ex.get("/", async (_, res) => {
       const json = new HomeDto({ greet: "Hello World!" });
       res.json(json);
     });
