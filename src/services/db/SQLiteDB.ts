@@ -14,7 +14,7 @@ import {
   type Paginated,
   type PaginationOpt,
 } from "../../utils/Pagination.js";
-import type { Token } from "../../models/Token.js";
+import type { Challenge } from "../../models/Challenge.js";
 
 export class SQLiteDB extends DB {
   private db: Database.Database;
@@ -426,27 +426,29 @@ export class SQLiteDB extends DB {
     throw new Error("Method not implemented");
   }
 
-  async saveToken(token: Token): Promise<void> {
+  async saveChallenge(challenge: Challenge): Promise<void> {
     const query =
-      "INSERT INTO token (token, userId, expiresAt) VALUES (@token, @userId, @expiresAt)";
+      "INSERT INTO token (token, userId, expiresAt) VALUES (@challenge, @userId, @expiresAt)";
     try {
-      this.db.prepare(query).run(token);
+      this.db.prepare(query).run(challenge);
       Logger.log(
-        `✅ [💾SQLite ${this.name}][saveToken()] Query -> ${query} with - ${token.userId}, ${token.expiresAt}`
+        `✅ [💾SQLite ${this.name}][saveToken()] Query -> ${query} with - ${challenge.userId}, ${challenge.expiresAt}`
       );
     } catch (error) {
       Logger.error(error);
     }
   }
 
-  async getToken(challenge: Token["token"]): Promise<Token | undefined> {
+  async getChallenge(
+    challengeToken: Challenge["challenge"]
+  ): Promise<Challenge | undefined> {
     const query = "SELECT * FROM token WHERE token = ?";
     try {
-      const token = this.db.prepare(query).get(challenge);
+      const challenge = this.db.prepare(query).get(challengeToken);
       Logger.log(
         `✅ [💾SQLite ${this.name}][getToken()] Query -> ${query} with -`
       );
-      return token ? (token as Token) : undefined;
+      return challenge ? (challenge as Challenge) : undefined;
     } catch (error) {
       Logger.error(error);
     }

@@ -7,7 +7,7 @@ import config from "config";
 import type { User } from "../../models/User.js";
 import type { Paginated, PaginationOpt } from "../../utils/Pagination.js";
 import { Service } from "../Service.js";
-import type { Token } from "../../models/Token.js";
+import type { Challenge } from "../../models/Challenge.js";
 
 /**
  * The database service, this is the interface that all database services should implement.
@@ -242,13 +242,15 @@ export abstract class DB extends Service {
    * Save a challenge token to the database.
    * @param token
    */
-  abstract saveToken(token: Token): Promise<void>;
+  abstract saveChallenge(challenge: Challenge): Promise<void>;
 
   /**
    * Get a challenge token from the database.
    * @param token
    */
-  abstract getToken(token: Token["token"]): Promise<Token | undefined>;
+  abstract getChallenge(
+    token: Challenge["challenge"]
+  ): Promise<Challenge | undefined>;
 }
 
 /**
