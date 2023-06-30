@@ -3,12 +3,14 @@ import config from "config";
 import { Logger } from "../../../utils/Logger.js";
 import { Str } from "../../../utils/Str.js";
 import { otherwise } from "../../../utils/ez.js";
+import { Service } from "../../Service.js";
 
-export class Telegram {
+export class Telegram extends Service {
   private token: string;
   private bot: Bot;
   private recipientChatId: string;
   constructor(token?: string, recipientChatId?: string) {
+    super();
     this.token = otherwise(token, () => config.get("notifier.telegram.token"));
     this.recipientChatId = otherwise(recipientChatId, () =>
       config.get("notifier.telegram.recipientChatId")
@@ -22,11 +24,13 @@ export class Telegram {
     this.bot.start();
     config.get("notifier.notifyOnStart") &&
       this.send("🦍 scared-ape is getting scared and is running 🦍");
+    this.running = true;
   }
 
   async stop() {
     Logger.log("🔄 [📪Telegram][stop()] Stopping Telegram bot...");
     await this.bot.stop();
+    this.running = false;
   }
 
   private registerCommands() {
