@@ -23,12 +23,12 @@ export class ScaredApe {
   private mailer: Mailer;
   private auth: Auth;
   constructor() {
-    this.auth = new Auth();
     this.db = new SQLiteDB();
     this.cache = new Cache();
     this.mailer = new Mailer();
-    this.fetcher = new Fetcher(this.cache);
+    this.auth = new Auth(this.db);
     this.notifier = new Telegram();
+    this.fetcher = new Fetcher(this.cache);
     this.api = new Api(
       this.db,
       this.scheduler,
