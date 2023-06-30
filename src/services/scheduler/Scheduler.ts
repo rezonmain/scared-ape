@@ -3,11 +3,13 @@ import { Logger } from "../../utils/Logger.js";
 import type { DB } from "../db/DB.js";
 import { ScrapersHelper } from "../../utils/ScrapersHelper.js";
 import type { Notifier } from "../notifier/Notifier.js";
+import { Service } from "../Service.js";
 
-export class Scheduler {
+export class Scheduler extends Service {
   private toadScheduler: ToadScheduler;
   public jobs: SimpleIntervalJob[] = [];
   constructor(private db: DB, private notifier: Notifier) {
+    super();
     this.toadScheduler = new ToadScheduler();
   }
 
@@ -79,11 +81,13 @@ export class Scheduler {
         name: scraper.knownId,
         interval: scraper.interval,
       });
+      this.running = true;
     });
   }
 
   public stop() {
     Logger.log("🔄 [🦎Scheduler][stop()] Stopping scheduler...");
     this.toadScheduler.stop();
+    this.running = false;
   }
 }
