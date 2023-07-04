@@ -1,13 +1,14 @@
 import type { NextFunction, request, response } from "express";
-import { isNothingOrZero } from "../../utils/ez.js";
+import { isNothingOrZero, parseCookie } from "../../utils/ez.js";
 
 const authenticated = (
   req: typeof request,
   res: typeof response,
   next: NextFunction
 ) => {
-  const fgp = req.cookies?.["__Secure-fgp"] ?? null;
-  const jwt = req.cookies?.["__Secure-jwt"] ?? null;
+  const cookies = parseCookie(req.headers.cookie);
+  const fgp = cookies?.["__Secure-fgp"] ?? null;
+  const jwt = cookies?.["__Secure-jwt"] ?? null;
 
   if (isNothingOrZero(fgp) || isNothingOrZero(jwt)) {
     return res.status(401).send("Unauthenticated");
