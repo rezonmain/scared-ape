@@ -15,7 +15,7 @@ export class Mailer {
       Logger.log(
         `✅ [💌Mailer]: would've send challenge email to ${email} with challenge ${c.get(
           "clientUrl"
-        )}/challenge/${challenge} but app is running in dev`
+        )}/auth/challenge/${challenge} but app is running in dev`
       );
       return;
     }
