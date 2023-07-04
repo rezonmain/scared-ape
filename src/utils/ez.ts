@@ -57,3 +57,17 @@ export const isNothingOrZero = (value: unknown): boolean => {
   }
   return false;
 };
+
+/**
+ * Parses a cookie string into a key value pair object.
+ */
+export const parseCookie = (
+  cookie: string | undefined
+): Record<string, string> => {
+  const parsed: Record<string, string> = {};
+  cookie.split(";").forEach((pair) => {
+    const [key, value] = pair.split("=");
+    parsed[key.trim()] = value;
+  });
+  return parsed;
+};
