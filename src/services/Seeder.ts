@@ -9,6 +9,7 @@ export class Seeder {
     Logger.log("🔄 [🌱Seeder] Seeding database...");
     try {
       await this.createPyro();
+      await this.createNotWhitelisted();
       await this.registerScrapers();
       Logger.log("✅ [🌱Seeder] Database successfully seeded!");
     } catch (error) {
@@ -24,6 +25,18 @@ export class Seeder {
       return;
     }
     this.db.saveUser({ email, role: "pyro", whitelist: true });
+  }
+
+  private async createNotWhitelisted() {
+    const email = "notwhitelisted@test.com";
+    const pyro = await this.db.getUser(email);
+    if (pyro) {
+      Logger.log(
+        "✅ [🌱Seeder] not whitelisted user already exists in database"
+      );
+      return;
+    }
+    this.db.saveUser({ email, role: "demoman", whitelist: false });
   }
 
   private async registerScrapers() {
