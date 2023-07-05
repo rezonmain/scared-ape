@@ -4,6 +4,7 @@ import { isNothing } from "../../../utils/ez.js";
 import type { User } from "../../../models/User.js";
 import { Auth } from "../../auth/Auth.js";
 import { ChallengeSentDto, UserDto } from "../dto/auth.dto.js";
+import { ErrorHelper } from "../../../utils/ErrorHelper.js";
 
 const authRouter = Router();
 
@@ -22,7 +23,7 @@ authRouter.post("/", async (req, res) => {
     email = z.string().email().parse(unsafeEmail);
   } catch {
     return res.status(400).json({
-      error: "Invalid email",
+      error: ErrorHelper.message("auth_003"),
     });
   }
 
@@ -32,7 +33,7 @@ authRouter.post("/", async (req, res) => {
     user = await req.ctx.db.getUser(email);
     if (isNothing(user)) {
       return res.status(404).json({
-        error: "User not found",
+        error: ErrorHelper.message("auth_001"),
       });
     }
   } catch (error) {
@@ -43,7 +44,9 @@ authRouter.post("/", async (req, res) => {
 
   // Check if user is whitelisted
   if (!user.whitelist) {
-    return res.status(403).send("Not whitelisted");
+    return res.status(403).json({
+      error: ErrorHelper.message("auth_002"),
+    });
   }
 
   // Generate challenge token
@@ -83,21 +86,23 @@ authRouter.get("/challenge/:challenge", async (req, res) => {
     challengeToken = z.string().parse(unsafeChallengeToken);
   } catch {
     return res.status(400).json({
-      error: "Invalid challenge token",
+      error: ErrorHelper.message("auth_004"),
     });
   }
 
   // Check if challenge token is valid
-  const verified = await req.ctx.auth.verifyChallenge(challengeToken);
-  if (!verified) {
+  let user: User;
+  try {
+    user = await req.ctx.auth.verifyChallenge(challengeToken);
+  } catch (error) {
     return res.status(403).json({
-      error: "Invalid challenge token",
+      error,
     });
   }
 
   // At this point user is authenticated
   // Generate session
-  const { fgp, jwt } = req.ctx.auth.generateSession(verified.cuid);
+  const { fgp, jwt } = req.ctx.auth.generateSession(user.cuid);
   res.cookie("__Secure-fgp", fgp, {
     httpOnly: true,
     secure: true,
@@ -110,7 +115,7 @@ authRouter.get("/challenge/:challenge", async (req, res) => {
     sameSite: "strict",
   });
 
-  const json = new UserDto(verified);
+  const json = new UserDto(user);
   return res.status(200).json(json);
 });
 export { authRouter };
