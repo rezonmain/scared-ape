@@ -12,6 +12,7 @@ import type { Mailer } from "../mailer/Mailer.js";
 import type { Auth } from "../auth/Auth.js";
 import { authRouter } from "./routes/auth.js";
 import { HomeDto } from "./dto/api.dto.js";
+import { log } from "./log.middleware.js";
 
 export class Api extends Service {
   private ex: express.Express;
@@ -41,6 +42,7 @@ export class Api extends Service {
       next();
     });
 
+    this.ex.use(log);
     this.ex.use("/scraper", scraperRouter);
     this.ex.use("/run", runRouter);
     this.ex.use("/job", jobRouter);
