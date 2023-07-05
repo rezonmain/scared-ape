@@ -7,6 +7,7 @@ import type { DB } from "../db/DB.js";
 import type { User } from "../../models/User.js";
 import { CacheHelper } from "../../utils/CacheHelper.js";
 import type { Session } from "../../types/Session.js";
+import { ErrorHelper } from "../../utils/ErrorHelper.js";
 
 export class Auth {
   private secret: string;
@@ -44,18 +45,22 @@ export class Auth {
     }
   }
 
-  async verifyChallenge(challengeToken: string): Promise<false | User> {
-    let user: User;
-    try {
-      const challenge = await this.db.getChallenge(challengeToken);
-      if (isNothing(challenge)) return false;
-      if (new Date(challenge.expiresAt) < new Date()) return false;
-      user = await this.db.getUserById(challenge.userId);
-      if (isNothing(user)) return false;
-      if (!user.whitelist) return false;
-    } catch {
-      return false;
-    }
+  async verifyChallenge(challengeToken: string): Promise<User> {
+    // Check if challenge exists
+    const challenge = await this.db.getChallenge(challengeToken);
+    if (isNothing(challenge)) throw ErrorHelper.message("auth_004");
+
+    // Check if challenge has expired
+    if (new Date(challenge.expiresAt) < new Date())
+      throw ErrorHelper.message("auth_005", Auth.challengeLifetime / 60);
+
+    // Check if user exists
+    const user = await this.db.getUserById(challenge.userId);
+    if (isNothing(user)) throw ErrorHelper.message("auth_001");
+
+    // Check if user is whitelisted
+    if (!user.whitelist) throw ErrorHelper.message("auth_002");
+
     return user;
   }
 
