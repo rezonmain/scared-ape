@@ -20,12 +20,28 @@ class UserDto implements User {
   get cuid() {
     return this.opts.cuid;
   }
+
+  get dto() {
+    return {
+      id: this.id,
+      email: this.email,
+      whitelist: this.whitelist,
+      role: this.role,
+      cuid: this.cuid,
+    };
+  }
 }
 
 class ChallengeSentDto implements IChallengeSent {
   constructor(private opts: IChallengeSent) {}
   get email() {
     return this.opts.email;
+  }
+
+  get dto() {
+    return {
+      email: this.email,
+    };
   }
 }
 

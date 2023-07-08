@@ -70,7 +70,7 @@ authRouter.post("/", async (req, res) => {
   // Send challenge token to user's email
   req.ctx.mailer.sendChallengeEmail(email, challengeToken);
   const json = new ChallengeSentDto({ email });
-  return res.json(json);
+  return res.json(json.dto);
 });
 
 /**
@@ -116,6 +116,6 @@ authRouter.get("/challenge/:challenge", async (req, res) => {
   });
 
   const json = new UserDto(user);
-  return res.status(200).json(json);
+  return res.status(200).json(json.dto);
 });
 export { authRouter };
