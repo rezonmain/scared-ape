@@ -17,6 +17,7 @@ import { log } from "./log.middleware.js";
 export class Api extends Service {
   private ex: express.Express;
   private port: number;
+  private services: Service[] = [];
   constructor(
     private db: DB,
     private scheduler: Scheduler,
@@ -27,6 +28,7 @@ export class Api extends Service {
     super();
     this.ex = express();
     this.port = config.get("api.port");
+    this.services = [this.db, this.scheduler, this.cache, this.mailer];
   }
 
   start() {
@@ -38,6 +40,7 @@ export class Api extends Service {
         cache: this.cache,
         mailer: this.mailer,
         auth: this.auth,
+        services: this.services,
       };
       next();
     });

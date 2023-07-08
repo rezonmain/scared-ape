@@ -1,13 +1,20 @@
 import { CourierClient } from "@trycourier/courier";
 import c from "config";
 import { Logger } from "../../utils/Logger.js";
+import { Service } from "../Service.js";
 
-export class Mailer {
+export class Mailer extends Service {
   private client: ReturnType<typeof CourierClient>;
   constructor() {
+    super();
     this.client = CourierClient({
       authorizationToken: c.get("mailer.courier.apiKey"),
     });
+    this.running = true;
+  }
+
+  get name() {
+    return "mailer";
   }
 
   async sendChallengeEmail(email: string, challenge: string): Promise<string> {

@@ -31,6 +31,10 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
     return ["LMG_jobs"];
   }
 
+  get description(): string {
+    return "Scrapes the list of jobs from the jobs page of the LMG website";
+  }
+
   async scrape(): Promise<void> {
     Logger.log(`🔄 [${this.name}] scraping...`);
     this.saveRun();

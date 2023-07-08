@@ -1,10 +1,8 @@
 import { Router } from "express";
 import { isNothing } from "../../../utils/ez.js";
-import { authenticated } from "../auth.middleware.js";
 import { ScraperDto } from "../dto/scraper.dto.js";
 
 const scraperRouter = Router();
-scraperRouter.use(authenticated);
 
 /**
  * List all scrapers
@@ -12,7 +10,7 @@ scraperRouter.use(authenticated);
  */
 scraperRouter.get("/", async (req, res) => {
   const scrapers = await req.ctx.db.getAllScrapers();
-  const json = scrapers.map((s) => new ScraperDto(s));
+  const json = scrapers.map((s) => new ScraperDto(s).dto);
   return res.json(json);
 });
 
@@ -24,7 +22,7 @@ scraperRouter.get("/:knownId", async (req, res) => {
   if (isNothing(scraper)) {
     return res.status(404).send("Scraper not found");
   }
-  const json = new ScraperDto(scraper);
+  const json = new ScraperDto(scraper).dto;
   return res.json(json);
 });
 

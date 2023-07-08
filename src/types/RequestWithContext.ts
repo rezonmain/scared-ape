@@ -3,6 +3,7 @@ import type { Scheduler } from "../services/scheduler/Scheduler.js";
 import type { Cache } from "../services/cache/Cache.js";
 import type { Mailer } from "../services/mailer/Mailer.js";
 import type { Auth } from "../services/auth/Auth.js";
+import type { Service } from "../services/Service.js";
 
 declare global {
   namespace Express {
@@ -13,6 +14,7 @@ declare global {
         cache: Cache;
         mailer: Mailer;
         auth: Auth;
+        services: Service[];
       };
     }
   }

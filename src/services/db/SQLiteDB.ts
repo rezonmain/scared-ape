@@ -108,7 +108,7 @@ export class SQLiteDB extends DB {
 
   async registerManyScrapers(scrapers: IScraper[]): Promise<void> {
     const query =
-      "INSERT INTO scraper (name, status, knownId, interval, shouldNotifyChanges, associatedWidgets) VALUES (?, ?, ?, ?, ?, ?)";
+      "INSERT INTO scraper (name, status, knownId, interval, shouldNotifyChanges, associatedWidgets, url, description) VALUES (?, ?, ?, ?, ?, ?)";
     const stmt = this.db.prepare(query);
     const insertMany = this.db.transaction(() => {
       scrapers.forEach((scraper) => {
@@ -118,7 +118,9 @@ export class SQLiteDB extends DB {
           scraper.knownId,
           scraper.interval,
           scraper.shouldNotifyChanges ? 1 : 0,
-          scraper.associatedWidgets.join(",")
+          scraper.associatedWidgets.join(","),
+          scraper.url,
+          scraper.description
         );
         Logger.log(
           `✅ [💾SQLite ${

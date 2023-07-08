@@ -8,4 +8,6 @@ export interface IScraper extends Entity {
   status?: ScraperStatus; // defualt "inactive"
   interval?: number; // in seconds, default 24 hrs so 86400
   shouldNotifyChanges?: boolean; // default false
+  description?: string;
+  url?: string;
 }

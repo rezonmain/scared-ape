@@ -21,6 +21,7 @@ export abstract class Scraper<Dto = void> {
   abstract get name(): string;
   abstract get knownId(): string;
   abstract get associatedWidgets(): string[];
+  abstract get description(): string;
   /**
    * Create a run entry in the database and saves the runId
    */
@@ -113,6 +114,8 @@ export abstract class Scraper<Dto = void> {
       interval: this.interval,
       associatedWidgets: this.associatedWidgets,
       shouldNotifyChanges: this.shouldNotifyChanges,
+      description: this.description,
+      url: this.url,
     };
   }
 }
