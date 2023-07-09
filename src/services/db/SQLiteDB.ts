@@ -108,7 +108,7 @@ export class SQLiteDB extends DB {
 
   async registerManyScrapers(scrapers: IScraper[]): Promise<void> {
     const query =
-      "INSERT INTO scraper (name, status, knownId, interval, shouldNotifyChanges, associatedWidgets, url, description) VALUES (?, ?, ?, ?, ?, ?)";
+      "INSERT INTO scraper (name, status, knownId, interval, shouldNotifyChanges, associatedWidgets, url, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const stmt = this.db.prepare(query);
     const insertMany = this.db.transaction(() => {
       scrapers.forEach((scraper) => {
@@ -166,8 +166,36 @@ export class SQLiteDB extends DB {
     }
   }
 
-  pgGetAllScrapers(pagination: PaginationOpt): Promise<Paginated<IScraper>> {
-    throw new Error("Method not implemented.");
+  async pgGetAllScrapers(opt: PaginationOpt): Promise<Paginated<IScraper>> {
+    let query = "SELECT * FROM scraper ORDER BY id DESC LIMIT ? OFFSET ?";
+    try {
+      const list = this.db
+        .prepare(query)
+        .all(opt.limit, opt.offset * opt.limit) as IScraper[];
+
+      Logger.log(
+        `✅ [💾SQLite ${
+          this.name
+        }][pgGetAllScrapers()] Query -> ${query} with ${Object.values(opt).join(
+          ","
+        )}`
+      );
+
+      query = "SELECT COUNT(*) FROM scraper";
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][pgGetAllScrapers()] Query -> ${query}`
+      );
+
+      const total = this.db.prepare(query).get()["COUNT(*)"];
+      const pagination = new Pagination(
+        opt.limit,
+        opt.offset,
+        total
+      ).getPagination();
+      return { list, pagination };
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 
   async getActiveScrapers(): Promise<IScraper[]> {

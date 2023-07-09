@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { isNothing } from "../../../utils/ez.js";
+import { isNothing, otherwise, unsafeCoerce } from "../../../utils/ez.js";
 import { ScraperDto } from "../dto/scraper.dto.js";
+import { Pagination } from "../../../utils/Pagination.js";
 
 const scraperRouter = Router();
 
@@ -9,9 +10,18 @@ const scraperRouter = Router();
  * @route GET /scraper
  */
 scraperRouter.get("/", async (req, res) => {
-  const scrapers = await req.ctx.db.getAllScrapers();
-  const json = scrapers.map((s) => new ScraperDto(s).dto);
-  return res.json(json);
+  const limit = otherwise(req.query.limit, Pagination.defaultLimit);
+  const page = otherwise(req.query.page, 0);
+  const scrapers = await req.ctx.db.pgGetAllScrapers({
+    limit: unsafeCoerce<number>(limit),
+    offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
+  });
+  if (isNothing(scrapers)) {
+    return res
+      .status(404)
+      .send("No runs found for the provided scraper knownId");
+  }
+  return res.json(scrapers);
 });
 
 /**
