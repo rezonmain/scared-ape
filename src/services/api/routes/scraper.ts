@@ -12,16 +12,17 @@ const scraperRouter = Router();
 scraperRouter.get("/", async (req, res) => {
   const limit = otherwise(req.query.limit, Pagination.defaultLimit);
   const page = otherwise(req.query.page, 0);
-  const scrapers = await req.ctx.db.pgGetAllScrapers({
+  const { pagination, list } = await req.ctx.db.pgGetAllScrapers({
     limit: unsafeCoerce<number>(limit),
     offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
   });
-  if (isNothing(scrapers)) {
+  if (isNothing(list)) {
     return res
       .status(404)
       .send("No runs found for the provided scraper knownId");
   }
-  return res.json(scrapers);
+  const scrapers = list.map((scraper) => new ScraperDto(scraper).dto);
+  return res.json({ pagination, list: scrapers });
 });
 
 /**

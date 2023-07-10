@@ -18,7 +18,7 @@ class ScraperDto implements IScraper {
     return this.opts.interval;
   }
   get shouldNotifyChanges() {
-    return this.opts.shouldNotifyChanges;
+    return this.opts.shouldNotifyChanges ? true : false;
   }
   get description() {
     return this.opts.description;
@@ -34,7 +34,7 @@ class ScraperDto implements IScraper {
       associatedWidgets: this.associatedWidgets,
       status: this.status,
       interval: this.interval,
-      shouldNotifyChanges: this.shouldNotifyChanges,
+      shouldNotifyChanges: this.shouldNotifyChanges ? true : false,
       description: this.description,
       url: this.url,
     };
