@@ -8,6 +8,7 @@ import type { User } from "../../models/User.js";
 import type { Paginated, PaginationOpt } from "../../utils/Pagination.js";
 import { Service } from "../Service.js";
 import type { Challenge } from "../../models/Challenge.js";
+import type { Revocation } from "../../models/Revocation.js";
 
 /**
  * The database service, this is the interface that all database services should implement.
@@ -251,6 +252,20 @@ export abstract class DB extends Service {
   abstract getChallenge(
     challengeToken: Challenge["challenge"]
   ): Promise<Challenge | undefined>;
+
+  /**
+   * Add a jwt revocation to the database.
+   * @param revocation
+   */
+  abstract saveRevocation(revocation: Revocation): Promise<void>;
+
+  /**
+   * Get a jwt revocation from the database.
+   * @param jwtHash
+   */
+  abstract getRevocation(
+    jwtHash: Revocation["jwtHash"]
+  ): Promise<Revocation | null>;
 }
 
 /**
