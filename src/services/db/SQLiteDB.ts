@@ -15,6 +15,7 @@ import {
   type PaginationOpt,
 } from "../../utils/Pagination.js";
 import type { Challenge } from "../../models/Challenge.js";
+import type { Revocation } from "../../models/Revocation.js";
 
 export class SQLiteDB extends DB {
   private db: Database.Database;
@@ -479,6 +480,34 @@ export class SQLiteDB extends DB {
         `✅ [💾SQLite ${this.name}][getChallenge()] Query -> ${query} with -`
       );
       return challenge ? (challenge as Challenge) : undefined;
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async saveRevocation(revocation: Revocation): Promise<void> {
+    const query =
+      "INSERT INTO revocation (jwtHash, revocationDate) VALUES (@jwtHash, @revocationDate)";
+    try {
+      this.db.prepare(query).run(revocation);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][saveRevocation()] Query -> ${query} with - ${revocation.jwtHash}, ${revocation.revocationDate}`
+      );
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async getRevocation(
+    jwtHash: Revocation["jwtHash"]
+  ): Promise<Revocation | undefined> {
+    const query = "SELECT * FROM revocation WHERE jwtHash = ?";
+    try {
+      const revocation = this.db.prepare(query).get(jwtHash);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][getRevocation()] Query -> ${query} with - ${jwtHash}`
+      );
+      return revocation ? (revocation as Revocation) : undefined;
     } catch (error) {
       Logger.error(error);
     }
