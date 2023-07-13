@@ -102,17 +102,20 @@ authRouter.get("/challenge/:challenge", async (req, res) => {
 
   // At this point user is authenticated
   // Generate session
+  // Cookie lifetime must be equal or less than jwt lifetime
   const { fgp, jwt } = req.ctx.auth.generateSession(user.cuid);
   res.cookie("__Secure-fgp", fgp, {
     httpOnly: true,
     secure: true,
     sameSite: "strict",
+    maxAge: 1000 * 60 * 60 * 24 * 3, // 3 days
   });
 
   res.cookie("__Secure-jwt", jwt, {
     httpOnly: true,
     secure: true,
     sameSite: "strict",
+    maxAge: 1000 * 60 * 60 * 24 * 3, // 3 days
   });
 
   const json = new UserDto(user);

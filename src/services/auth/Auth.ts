@@ -11,8 +11,11 @@ import { ErrorHelper } from "../../utils/ErrorHelper.js";
 
 export class Auth {
   private secret: string;
-  private generateChallengeId: () => string;
+  private generateChallenge: () => string;
   private generateSessionUserFingerprint: () => string;
+
+  static challengeLifetime = 1 * 60 * 5; // 5 minutes
+  static sessionLifetime = "3d"; // 3 days
 
   constructor(private db: DB) {
     this.secret = c.get("auth.jwt.secret");
@@ -20,7 +23,7 @@ export class Auth {
       Logger.error("Auth: secret is not defined in config file");
       process.exit(1);
     }
-    this.generateChallengeId = init({
+    this.generateChallenge = init({
       length: 16,
     });
 
@@ -30,7 +33,7 @@ export class Auth {
   }
 
   generateChallengeToken(): string {
-    return this.generateChallengeId();
+    return this.generateChallenge();
   }
 
   verifyJWT({ jwt: _jwt, fgp }: Session): boolean {
@@ -68,7 +71,7 @@ export class Auth {
     const fgp = this.generateSessionUserFingerprint();
     const hashedFgp = CacheHelper.hashData(fgp);
 
-    const j = jwt.sign(
+    const _jwt = jwt.sign(
       {
         cuid: userCuid,
         fgp: hashedFgp,
@@ -82,11 +85,7 @@ export class Auth {
 
     return {
       fgp,
-      jwt: j,
+      jwt: _jwt,
     };
   }
-
-  static challengeLifetime = 1 * 60 * 5; // 5 minutes
-  static sessionLifetime = "1h";
-  static refreshLifetime = "1d";
 }
