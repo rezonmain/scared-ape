@@ -40,10 +40,12 @@ export class Auth {
     const hashedFingerprint = CacheHelper.hashData(fgp);
     try {
       const decoded = jwt.verify(_jwt, this.secret, { issuer: "ape" });
-      if (typeof decoded !== "object") return false;
-      if (decoded.fgp !== hashedFingerprint) return false;
+      if (typeof decoded !== "object") throw "JWT has no body";
+      if (decoded.fgp !== hashedFingerprint)
+        throw "JWT fingerprint doesn't match";
       return true;
-    } catch {
+    } catch (error) {
+      Logger.log(`➡️ [🔒Auth][verifyJWT()] ${JSON.stringify(error)})`);
       return false;
     }
   }
@@ -87,5 +89,24 @@ export class Auth {
       fgp,
       jwt: _jwt,
     };
+  }
+
+  revokeJWT({
+    jwt,
+    revocationDate,
+  }: {
+    jwt: Session["jwt"];
+    revocationDate?: string; // iso date string
+  }): void {
+    const revocation = revocationDate ?? new Date().toISOString();
+    const jwtHash = CacheHelper.hashData(jwt);
+    this.db.saveRevocation({ jwtHash, revocationDate: revocation });
+  }
+
+  async isRevokedJWT({ jwt }: { jwt: Session["jwt"] }): Promise<boolean> {
+    const jwtHash = CacheHelper.hashData(jwt);
+    const isRevoked = !isNothing(await this.db.getRevocation(jwtHash));
+    console.log(isRevoked);
+    return isRevoked;
   }
 }
