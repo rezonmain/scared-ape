@@ -2,9 +2,11 @@ import { Router } from "express";
 import { isNothing, otherwise, unsafeCoerce } from "../../../utils/ez.js";
 import { ScraperDto } from "../dto/scraper.dto.js";
 import { Pagination } from "../../../utils/Pagination.js";
+import { authenticated } from "../auth.middleware.js";
 
 const scraperRouter = Router();
 
+scraperRouter.use(authenticated);
 /**
  * List all scrapers
  * @route GET /scraper
