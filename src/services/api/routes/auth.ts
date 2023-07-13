@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { isNothing } from "../../../utils/ez.js";
+import { isNothing, parseCookie } from "../../../utils/ez.js";
 import type { User } from "../../../models/User.js";
 import { Auth } from "../../auth/Auth.js";
 import { ChallengeSentDto, UserDto } from "../dto/auth.dto.js";
@@ -121,4 +121,32 @@ authRouter.get("/challenge/:challenge", async (req, res) => {
   const json = new UserDto(user);
   return res.status(200).json(json.dto);
 });
+
+authRouter.post("/yeet", async (req, res) => {
+  res.clearCookie("__Secure-fgp", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+
+  res.clearCookie("__Secure-jwt", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+
+  if (!req.headers.cookie) return res.status(400);
+
+  const cookies = parseCookie(req.headers.cookie);
+  const jwt = cookies?.["__Secure-jwt"] ?? null;
+
+  try {
+    req.ctx.auth.revokeJWT({ jwt });
+
+    return res.status(200).send("YEETED");
+  } catch (error) {
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
 export { authRouter };
