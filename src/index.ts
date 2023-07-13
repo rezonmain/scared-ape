@@ -8,7 +8,7 @@ if (!(await FileHelper.exists(`config/local-${process.env.NODE_ENV}.json5`))) {
 }
 (async () => {
   const booter = new Booter();
-  await booter.boot();
+  await booter.boot({ initialScrape: false });
   const app = new ScaredApe();
   app.run();
 })();
