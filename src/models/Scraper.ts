@@ -11,3 +11,7 @@ export interface IScraper extends Entity {
   description?: string;
   url?: string;
 }
+
+export interface RawScraper extends Omit<IScraper, "associatedWidgets"> {
+  associatedWidgets: string;
+}
