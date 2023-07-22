@@ -199,7 +199,12 @@ export class Booter {
     await this.db.migrate();
     const seeder = new Seeder(this.db);
     await seeder.seed();
-    await this.initialScrape(opts.initialScrape);
-    Logger.log("✅ [👾Booter][boot()] Successfully booted scared-ape.");
+    try {
+      await this.initialScrape(opts.initialScrape);
+    } catch (err) {
+      Logger.log("🚨 [👾Booter][boot()] Error while running initial scrape");
+      Logger.log(err);
+    }
+    Logger.log("✅ [👾Booter][boot()] Booted scared-ape.");
   }
 }
