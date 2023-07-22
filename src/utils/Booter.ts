@@ -5,7 +5,7 @@ import { ScrapersHelper } from "./ScrapersHelper.js";
 import type { IScraper } from "../models/Scraper.js";
 import JSON5 from "json5";
 import { FileHelper } from "./FileHelper.js";
-import { isNothingOrZero } from "./ez.js";
+import { isNothing, isNothingOrZero } from "./ez.js";
 import c from "config";
 import { Telegram } from "../services/notifier/Telegram/Telegram.js";
 import inquirer from "inquirer";
@@ -158,16 +158,21 @@ export class Booter {
   private async initialScrape(scrape = false) {
     if (!scrape) return;
     // Get all active scrapers
-    Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
+    Logger.log("🔄 [👾Booter][boot()] Getting missing active scrapers...");
     const activeScrapers = await this.db.getActiveScrapers();
-    const notRanScrapers = await Promise.all(
-      activeScrapers
-        .map(async (scraper) => {
+    const notRanScrapers = (
+      await Promise.all(
+        activeScrapers.map(async (scraper) => {
           const json = await this.db.getLatestJson(scraper.knownId);
-          if (!json) return scraper;
+          if (isNothing(json)) return scraper;
           return undefined;
         })
-        .filter((s) => s !== undefined)
+      )
+    ).filter((s) => s);
+    Logger.log(
+      `🔄 [👾Booter][boot()] Running missing active scrapers ${notRanScrapers
+        .map((s) => s.name)
+        .join(", ")}`
     );
     await Promise.all(
       notRanScrapers.map((scraper) => this.runScraper(scraper.name))
