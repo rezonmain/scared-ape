@@ -11,6 +11,7 @@
     },
   },
   scrapers: {
+    scrapeOnBoot: true,
     path: "./src/scrapers",
   },
   pyro: {
