@@ -1,5 +1,6 @@
 import config from "config";
 import express from "express";
+import cors from "cors";
 import type { DB } from "../db/DB.js";
 import type { Scheduler } from "../scheduler/Scheduler.js";
 import type { Cache } from "../cache/Cache.js";
@@ -13,12 +14,16 @@ import type { Auth } from "../auth/Auth.js";
 import { authRouter } from "./routes/auth.js";
 import { HomeDto } from "./dto/api.dto.js";
 import { log } from "./log.middleware.js";
-import { cors } from "./cors.middleware.js";
+// import { cors } from "./cors.middleware.js";
 
 export class Api extends Service {
   private ex: express.Express;
   private port: number;
   private services: Service[] = [];
+  private corsOptions = {
+    origin: config.get<string[]>("allowedOrigins"),
+    credentials: true,
+  };
   constructor(
     private db: DB,
     private scheduler: Scheduler,
@@ -46,7 +51,8 @@ export class Api extends Service {
       next();
     });
 
-    this.ex.use(cors);
+    this.ex.use(cors(this.corsOptions));
+    this.ex.options("*", cors(this.corsOptions));
     this.ex.use(log);
     this.ex.use("/scraper", scraperRouter);
     this.ex.use("/run", runRouter);
