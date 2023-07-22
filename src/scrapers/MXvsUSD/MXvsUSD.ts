@@ -28,7 +28,7 @@ export class MXvsUSD extends Scraper<MXvsUSDDTO> {
   }
 
   get associatedWidgets(): string[] {
-    return [];
+    return ["MXVsUSD"];
   }
 
   get description(): string {

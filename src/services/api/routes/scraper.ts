@@ -39,4 +39,16 @@ scraperRouter.get("/:knownId", async (req, res) => {
   return res.json(json);
 });
 
+/**
+ * Get the latest scraper json
+ */
+
+scraperRouter.get("/:knownId/json", async (req, res) => {
+  const json = await req.ctx.db.getLatestJson(req.params.knownId);
+  if (isNothing(json)) {
+    return res.status(404).send("No JSON found for the provided scraper");
+  }
+  return res.json(json);
+});
+
 export { scraperRouter };

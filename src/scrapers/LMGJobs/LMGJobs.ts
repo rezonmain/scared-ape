@@ -28,7 +28,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
   }
 
   get associatedWidgets(): string[] {
-    return ["LMG_jobs"];
+    return [];
   }
 
   get description(): string {
