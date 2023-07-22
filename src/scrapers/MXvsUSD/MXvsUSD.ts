@@ -1,4 +1,3 @@
-import puppeteer from "puppeteer";
 import type { DB } from "../../services/db/DB.js";
 import { Scraper } from "../../services/Scraper.js";
 import { Logger } from "../../utils/Logger.js";
@@ -44,8 +43,7 @@ export class MXvsUSD extends Scraper<MXvsUSDDTO> {
       mxToUsd: 0,
     };
     try {
-      const browser = await puppeteer.launch({
-        headless: "new",
+      const browser = await this.launchBrowser({
         timeout: 60000,
       });
       const page = await browser.newPage();

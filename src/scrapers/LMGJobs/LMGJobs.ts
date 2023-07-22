@@ -1,4 +1,3 @@
-import puppeteer from "puppeteer";
 import type { DB } from "../../services/db/DB.js";
 import { Scraper } from "../../services/Scraper.js";
 import type { LMGJobsDTO } from "./LMGJobs.dto.js";
@@ -41,7 +40,7 @@ export class LMGJobs extends Scraper<LMGJobsDTO> {
     let listings: LMGJobsDTO[] = [];
     let screenshot: Buffer;
     try {
-      const browser = await puppeteer.launch({ headless: "new" });
+      const browser = await this.launchBrowser();
       const page = await browser.newPage();
       await page.goto(this.url);
 
