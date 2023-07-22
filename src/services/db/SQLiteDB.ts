@@ -3,7 +3,7 @@ import type { Json } from "../../models/Json.js";
 import type { Run } from "../../models/Run.js";
 import Database from "better-sqlite3";
 import { createId } from "@paralleldrive/cuid2";
-import type { IScraper } from "../../models/Scraper.js";
+import type { IScraper, RawScraper } from "../../models/Scraper.js";
 import type { Screenshot } from "../../models/Screenshot.js";
 import { MigrationsHelper } from "../../utils/MigrationsHelper.js";
 import { DB } from "./DB.js";
@@ -172,7 +172,15 @@ export class SQLiteDB extends DB {
     try {
       const list = this.db
         .prepare(query)
-        .all(opt.limit, opt.offset * opt.limit) as IScraper[];
+        .all(opt.limit, opt.offset * opt.limit) as RawScraper[];
+
+      const scrapers = list.map((scraper) => {
+        const { associatedWidgets, ...rest } = scraper;
+        return {
+          ...rest,
+          associatedWidgets: associatedWidgets.split(","),
+        };
+      }) as IScraper[];
 
       Logger.log(
         `✅ [💾SQLite ${
@@ -193,7 +201,7 @@ export class SQLiteDB extends DB {
         opt.offset,
         total
       ).getPagination();
-      return { list, pagination };
+      return { list: scrapers, pagination };
     } catch (error) {
       Logger.error(error);
     }
