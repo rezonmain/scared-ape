@@ -106,7 +106,6 @@ export class Auth {
   async isRevokedJWT({ jwt }: { jwt: Session["jwt"] }): Promise<boolean> {
     const jwtHash = CacheHelper.hashData(jwt);
     const isRevoked = !isNothing(await this.db.getRevocation(jwtHash));
-    console.log(isRevoked);
     return isRevoked;
   }
 }
