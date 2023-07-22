@@ -13,6 +13,7 @@ import type { Auth } from "../auth/Auth.js";
 import { authRouter } from "./routes/auth.js";
 import { HomeDto } from "./dto/api.dto.js";
 import { log } from "./log.middleware.js";
+import { cors } from "./cors.middleware.js";
 
 export class Api extends Service {
   private ex: express.Express;
@@ -45,6 +46,7 @@ export class Api extends Service {
       next();
     });
 
+    this.ex.use(cors);
     this.ex.use(log);
     this.ex.use("/scraper", scraperRouter);
     this.ex.use("/run", runRouter);
