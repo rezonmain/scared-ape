@@ -4,3 +4,5 @@ node_modules
 *.db
 config/local-*
 config/*dev*
+config/*prod*
+.env
