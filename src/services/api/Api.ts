@@ -17,12 +17,8 @@ import { cors } from "./cors.middleware.js";
 
 export class Api extends Service {
   private ex: express.Express;
-  private port: number;
+  private port: number | string;
   private services: Service[] = [];
-  private corsOptions = {
-    origin: config.get<string[]>("allowedOrigins"),
-    credentials: true,
-  };
   constructor(
     private db: DB,
     private scheduler: Scheduler,
@@ -32,7 +28,7 @@ export class Api extends Service {
   ) {
     super();
     this.ex = express();
-    this.port = config.get("api.port");
+    this.port = process.env.PORT ?? config.get("api.port");
     this.services = [this.db, this.scheduler, this.cache, this.mailer];
   }
 
