@@ -155,6 +155,28 @@ export class Booter {
     return;
   }
 
+  private async initialScrape(scrape = false) {
+    if (!scrape) return;
+    // Get all active scrapers
+    Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
+    const activeScrapers = await this.db.getActiveScrapers();
+    const notRanScrapers = await Promise.all(
+      activeScrapers
+        .map(async (scraper) => {
+          const json = await this.db.getLatestJson(scraper.knownId);
+          if (!json) return scraper;
+          return undefined;
+        })
+        .filter((s) => s !== undefined)
+    );
+    await Promise.all(
+      notRanScrapers.map((scraper) => this.runScraper(scraper.name))
+    );
+    Logger.log(
+      "✅ [👾Booter][boot()] All missing active scrapers finished running."
+    );
+  }
+
   /**
    * Boot the app.
    *
@@ -172,15 +194,7 @@ export class Booter {
     await this.db.migrate();
     const seeder = new Seeder(this.db);
     await seeder.seed();
-    if (opts.initialScrape) {
-      // Run all the active scrapers
-      Logger.log("🔄 [👾Booter][boot()] Starting active scrapers...");
-      const activeScrapers = await this.db.getActiveScrapers();
-      await Promise.all(
-        activeScrapers.map((scraper) => this.runScraper(scraper.name))
-      );
-      Logger.log("✅ [👾Booter][boot()] All active scrapers finished running.");
-    }
+    await this.initialScrape(opts.initialScrape);
     Logger.log("✅ [👾Booter][boot()] Successfully booted scared-ape.");
   }
 }
