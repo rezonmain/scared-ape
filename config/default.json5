@@ -1,5 +1,6 @@
 {
-  clientUrl: "",
+  clientUrl: "https://apeq.app",
+  allowedOrigins: ["https://apeq.app"],
   instance: {
     name: "local",
   },
