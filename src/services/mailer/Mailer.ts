@@ -18,11 +18,11 @@ export class Mailer extends Service {
   }
 
   async sendChallengeEmail(email: string, challenge: string): Promise<string> {
-    if (process.env.NODE_ENV === "dev") {
+    if (process.env.NODE_ENV !== "production") {
       Logger.log(
         `✅ [💌Mailer]: would've send challenge email to ${email} with challenge ${c.get(
           "clientUrl"
-        )}/auth/challenge/${challenge} but app is running in dev`
+        )}/auth/challenge/${challenge} but app is running in an environment other than production`
       );
       return;
     }

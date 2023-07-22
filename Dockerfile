@@ -20,5 +20,4 @@ COPY pnpm-lock.yaml ./
 RUN pnpm i
 COPY . .
 EXPOSE 7363
-ENV NODE_ENV prod
 CMD [ "pnpm", "start" ]
