@@ -44,7 +44,10 @@ export class MXvsUSD extends Scraper<MXvsUSDDTO> {
       mxToUsd: 0,
     };
     try {
-      const browser = await puppeteer.launch({ headless: "new" });
+      const browser = await puppeteer.launch({
+        headless: "new",
+        timeout: 60000,
+      });
       const page = await browser.newPage();
       await page.goto(this.url);
 
