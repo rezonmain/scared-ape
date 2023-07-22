@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import puppeteer, { type LaunchOptions } from "puppeteer";
 import type { Run } from "../models/Run.js";
 import type { IScraper } from "../models/Scraper.js";
 import type { DB } from "./db/DB.js";
@@ -6,6 +7,7 @@ import { CacheHelper } from "../utils/CacheHelper.js";
 import { Logger } from "../utils/Logger.js";
 import type { ScraperStatus } from "../constants/scraperStatus.js";
 import type { Telegram } from "./notifier/Telegram/Telegram.js";
+import { common } from "../constants/puppeteer.config.js";
 
 /*
   This is the base class for all scrapers.
@@ -100,6 +102,11 @@ export abstract class Scraper<Dto = void> {
       String.fromCharCode(...new Uint8Array(screenshot))
     );
     await this.db.saveScreenshot(this.runId, this.knownId, base64String);
+  }
+  protected async launchBrowser(
+    config?: LaunchOptions
+  ): Promise<puppeteer.Browser> {
+    return await puppeteer.launch({ ...common, ...config });
   }
   /**
    * Scrapes the data from the website and saves it to the database
