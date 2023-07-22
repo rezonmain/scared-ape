@@ -1,4 +1,3 @@
-import config from "config";
 import type { DB } from "./db/DB.js";
 import { ScrapersHelper } from "../utils/ScrapersHelper.js";
 import { Logger } from "../utils/Logger.js";
@@ -18,7 +17,7 @@ export class Seeder {
   }
 
   private async createPyro() {
-    const email = config.get<string>("pyro.email");
+    const email = process.env.PYRO;
     const pyro = await this.db.getUser(email);
     if (pyro) {
       Logger.log("✅ [🌱Seeder] pyro user already exists in database");
