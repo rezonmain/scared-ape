@@ -50,7 +50,7 @@ export class ScaredApe {
   async run() {
     this.db.connect();
     this.scheduler.start();
-    // this.notifier.start();
+    this.notifier.start();
     this.api.start();
   }
 }
