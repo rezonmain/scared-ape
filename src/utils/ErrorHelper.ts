@@ -12,6 +12,7 @@ export class ErrorHelper {
   static errors = {
     // general
     general_001: () => "Something went wrong",
+    general_002: () => "Too many requests",
 
     // auth
     auth_001: () => "Cannot find user",
@@ -20,6 +21,9 @@ export class ErrorHelper {
     auth_004: () => "Invalid email login, please try logging in again",
     auth_005: (challengeLifetime) =>
       `You email login has expired, it is valid for ${challengeLifetime} minutes. Please try logging in again`,
+
+    // access request
+    access_request_001: () => "You've already requested access",
   } as const;
 
   static message(code: ScaredApeErrorCodes, ...args: unknown[]): string {
