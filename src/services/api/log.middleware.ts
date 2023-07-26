@@ -6,7 +6,7 @@ const log = (req: typeof request, res: typeof response, next: NextFunction) => {
     Logger.log(
       "➡️  [🚀Api]",
       req.method,
-      req.baseUrl + req.url,
+      req.baseUrl ?? "" + req.url ?? "",
       res.statusCode
     );
   } else {
@@ -14,7 +14,7 @@ const log = (req: typeof request, res: typeof response, next: NextFunction) => {
       Logger.log(
         "➡️  [🚀Api]",
         req.method,
-        req.baseUrl + req.url,
+        req.baseUrl ?? "" + req.url ?? "",
         res.statusCode
       );
     });
