@@ -21,6 +21,7 @@ export class Telegram extends Notifier {
   }
 
   start() {
+    if (process.env.NODE_ENV === "dev") return;
     Logger.log("🔄 [📪Telegram][start()] Starting Telegram bot...");
     this.registerCommands();
     this.bot.start();
