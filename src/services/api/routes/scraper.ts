@@ -10,6 +10,8 @@ scraperRouter.use(authenticated);
 /**
  * List all scrapers
  * @route GET /scraper
+ * @query limit - The number of scrapers to return
+ * @query page - The page of scrapers to return
  */
 scraperRouter.get("/", async (req, res) => {
   const limit = otherwise(req.query.limit, Pagination.defaultLimit);
