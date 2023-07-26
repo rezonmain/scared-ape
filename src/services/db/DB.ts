@@ -224,6 +224,13 @@ export abstract class DB extends Service {
   abstract saveAccessRequest(email: AccessRequest["email"]): Promise<void>;
 
   /**
+   * Get an access request via email from the database.
+   */
+  abstract getAccessRequestByEmail(
+    email: AccessRequest["email"]
+  ): Promise<AccessRequest | undefined>;
+
+  /**
    * Update an access request to the database, this method should
    * ONLY be called by someone with 'pyro' role.
    * @param email
