@@ -24,6 +24,8 @@ export class ErrorHelper {
 
     // access request
     access_request_001: () => "You've already requested access",
+    access_request_002: () => "No access request found",
+    access_request_003: () => "Whitelisted query param must be a boolean",
   } as const;
 
   static message(code: ScaredApeErrorCodes, ...args: unknown[]): string {
