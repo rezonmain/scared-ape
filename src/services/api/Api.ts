@@ -16,6 +16,7 @@ import { HomeDto } from "./dto/api.dto.js";
 import { log } from "./log.middleware.js";
 import { cors } from "./cors.middleware.js";
 import { generalLimiter } from "./limiter.middleware.js";
+import { accessRequestRouter } from "./routes/access_request.js";
 
 export class Api extends Service {
   private ex: express.Express;
@@ -56,6 +57,7 @@ export class Api extends Service {
     this.ex.use("/run", runRouter);
     this.ex.use("/job", jobRouter);
     this.ex.use("/auth", authRouter);
+    this.ex.use("/access_request", accessRequestRouter);
 
     this.ex.get("/", async (_, res) => {
       const json = new HomeDto({ greet: "Hello World!" });
