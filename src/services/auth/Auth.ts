@@ -50,6 +50,17 @@ export class Auth {
     }
   }
 
+  decodeJWT(_jwt: Session["jwt"]): { cuid: string } | null {
+    try {
+      const decoded = jwt.verify(_jwt, this.secret, { issuer: "ape" });
+      if (typeof decoded !== "object") throw "JWT has no body";
+      return decoded as { cuid: string };
+    } catch (error) {
+      Logger.log(`➡️ [🔒Auth][decodeJWT()] ${JSON.stringify(error)})`);
+      return null;
+    }
+  }
+
   async verifyChallenge(challengeToken: string): Promise<User> {
     // Check if challenge exists
     const challenge = await this.db.getChallenge(challengeToken);
