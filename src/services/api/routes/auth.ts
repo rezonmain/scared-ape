@@ -13,6 +13,7 @@ const authRouter = Router();
 /**
  * Generate challenge token if user is whitelisted
  * and send it to user's email
+ * @query email
  */
 authRouter.post("/", async (req, res) => {
   const unsafeEmail = req.query.email;
