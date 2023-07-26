@@ -450,8 +450,31 @@ export class SQLiteDB extends DB {
     }
   }
 
-  saveAccessRequest(email: AccessRequest["email"]): Promise<void> {
-    throw new Error("Method not implemented");
+  async saveAccessRequest(email: AccessRequest["email"]): Promise<void> {
+    const query = "INSERT INTO access_request (email) VALUES (?)";
+    try {
+      this.db.prepare(query).run(email);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][saveAccessRequest()] Query -> ${query} with ${email}`
+      );
+      return;
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
+  }
+
+  async getAccessRequestByEmail(email: string): Promise<AccessRequest | null> {
+    const query = "SELECT * FROM access_request WHERE email = ?";
+    try {
+      const accessRequest = this.db.prepare(query).get(email);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][getAccessRequestByEmail()] Query -> ${query} with ${email}`
+      );
+      return accessRequest ? (accessRequest as AccessRequest) : null;
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 
   updateAccessRequest(
