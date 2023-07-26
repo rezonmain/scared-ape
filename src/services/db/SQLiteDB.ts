@@ -172,7 +172,7 @@ export class SQLiteDB extends DB {
     try {
       const list = this.db
         .prepare(query)
-        .all(opt.limit, opt.offset * opt.limit) as RawScraper[];
+        .all(opt.limit, opt.offset) as RawScraper[];
 
       const scrapers = list.map((scraper) => {
         const { associatedWidgets, ...rest } = scraper;
@@ -450,6 +450,19 @@ export class SQLiteDB extends DB {
     }
   }
 
+  async getUserByCuid(cuid: string): Promise<User | undefined> {
+    const query = "SELECT * FROM user WHERE cuid = ?";
+    try {
+      const user = this.db.prepare(query).get(cuid);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][getUserByCuid()] Query -> ${query} with ${cuid}`
+      );
+      return user ? (user as User) : undefined;
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
   async saveAccessRequest(email: AccessRequest["email"]): Promise<void> {
     const query = "INSERT INTO access_request (email) VALUES (?)";
     try {
@@ -477,11 +490,54 @@ export class SQLiteDB extends DB {
     }
   }
 
-  updateAccessRequest(
+  async pgGetAccessRequests(
+    opt: PaginationOpt
+  ): Promise<Paginated<AccessRequest>> {
+    let query =
+      "SELECT * FROM access_request ORDER BY id DESC LIMIT ? OFFSET ?";
+    try {
+      const list = this.db
+        .prepare(query)
+        .all(opt.limit, opt.offset) as AccessRequest[];
+
+      Logger.log(
+        `✅ [💾SQLite ${
+          this.name
+        }][pgGetAccessRequests()] Query -> ${query} with ${Object.values(
+          opt
+        ).join(",")}`
+      );
+
+      query = "SELECT COUNT(*) FROM access_request";
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][pgGetAccessRequests()] Query -> ${query}`
+      );
+
+      const total = this.db.prepare(query).get()["COUNT(*)"];
+      const pagination = new Pagination(
+        opt.limit,
+        opt.offset,
+        total
+      ).getPagination();
+      return { list, pagination };
+    } catch (error) {
+      Logger.error(error);
+    }
+  }
+
+  async updateAccessRequest(
     email: AccessRequest["email"],
     whitelisted: AccessRequest["whitelisted"]
   ): Promise<void> {
-    throw new Error("Method not implemented");
+    const query = "UPDATE access_request SET whitelisted = ? WHERE email = ?";
+    try {
+      this.db.prepare(query).run(whitelisted ? 1 : 0, email);
+      Logger.log(
+        `✅ [💾SQLite ${this.name}][updateAccessRequest()] Query -> ${query} with ${whitelisted}, ${email}`
+      );
+    } catch (error) {
+      Logger.error(error);
+    }
   }
 
   deleteAccessRequest(email: AccessRequest["email"]): Promise<void> {

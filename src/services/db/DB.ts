@@ -218,6 +218,12 @@ export abstract class DB extends Service {
   abstract getUserById(id: User["id"]): Promise<User | undefined>;
 
   /**
+   * Get one user by cuid
+   * @param cuid
+   */
+  abstract getUserByCuid(cuid: User["cuid"]): Promise<User | undefined>;
+
+  /**
    * Save an access request to the database.
    * @param email
    */
@@ -229,6 +235,13 @@ export abstract class DB extends Service {
   abstract getAccessRequestByEmail(
     email: AccessRequest["email"]
   ): Promise<AccessRequest | undefined>;
+
+  /**
+   * Get paginated access requests from the database.
+   */
+  abstract pgGetAccessRequests(
+    opt: PaginationOpt
+  ): Promise<Paginated<AccessRequest>>;
 
   /**
    * Update an access request to the database, this method should
