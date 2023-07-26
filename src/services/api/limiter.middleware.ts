@@ -12,10 +12,10 @@ const generalLimiter = rateLimit({
   max: 100,
 });
 
-const requestAccessLimiter = rateLimit({
+const accessRequestLimiter = rateLimit({
   ...sharedConfig,
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 2,
 });
 
-export { generalLimiter, requestAccessLimiter };
+export { generalLimiter, accessRequestLimiter };
