@@ -65,6 +65,7 @@ export const parseCookie = (
   cookie: string | undefined
 ): Record<string, string> => {
   const parsed: Record<string, string> = {};
+  if (isNothing(cookie)) return parsed;
   cookie.split(";").forEach((pair) => {
     const [key, value] = pair.split("=");
     parsed[key.trim()] = value;
