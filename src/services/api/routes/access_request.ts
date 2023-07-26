@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { isNothing, otherwise, parseCookie } from "../../../utils/ez.js";
-import { authenticated } from "../auth.middleware.js";
+import {
+  isNothing,
+  otherwise,
+  parseCookie,
+  unsafeCoerce,
+} from "../../../utils/ez.js";
+import { authenticated, asPyro } from "../auth.middleware.js";
 import { accessRequestLimiter } from "../limiter.middleware.js";
 import { z } from "zod";
 import { ErrorHelper } from "../../../utils/ErrorHelper.js";
+import { Pagination } from "../../../utils/Pagination.js";
+import { AccessRequestDto } from "../dto/accessRequest.dto.js";
 
 const accessRequestRouter = Router();
 
@@ -52,5 +59,64 @@ accessRequestRouter.post("/", accessRequestLimiter, async (req, res) => {
 });
 
 accessRequestRouter.use(authenticated);
+
+/**
+ * Get a paginate list of access requests
+ * @route GET /access_request
+ * @query limit - The number of accessRequests to return
+ * @query page - The page of accessRequests to return
+ */
+accessRequestRouter.get("/", asPyro, async (req, res) => {
+  const limit = otherwise(req.query.limit, Pagination.defaultLimit);
+  const page = otherwise(req.query.page, 0);
+  const { pagination, list } = await req.ctx.db.pgGetAccessRequests({
+    limit: unsafeCoerce<number>(limit),
+    offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
+  });
+  if (isNothing(list)) {
+    return res
+      .status(404)
+      .json({ error: ErrorHelper.message("access_request_002") });
+  }
+  const accessRequests = list.map(
+    (accessRequest) => new AccessRequestDto(accessRequest).dto
+  );
+  return res.json({ pagination, list: accessRequests });
+});
+
+/**
+ * Update the status of an access request
+ * @route PUT /access_request/:email
+ * @query whitelisted - The new whitelisted status required
+ */
+
+accessRequestRouter.put("/:email", asPyro, async (req, res) => {
+  const unsafeWhitelisted = req.query.whitelisted;
+  let whitelisted: boolean;
+  try {
+    whitelisted = z.boolean().parse(unsafeWhitelisted);
+  } catch {
+    return res.status(400).json({
+      error: ErrorHelper.message("access_request_003"),
+    });
+  }
+
+  const accessRequest = await req.ctx.db.getAccessRequestByEmail(
+    req.params.email
+  );
+
+  if (isNothing(accessRequest)) {
+    return res.status(404).json({
+      error: ErrorHelper.message("access_request_002"),
+    });
+  }
+
+  try {
+    await req.ctx.db.updateAccessRequest(accessRequest.email, whitelisted);
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+  return res.sendStatus(204);
+});
 
 export { accessRequestRouter };
