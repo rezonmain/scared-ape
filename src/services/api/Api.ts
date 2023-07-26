@@ -1,5 +1,6 @@
 import config from "config";
 import express from "express";
+import helmet from "helmet";
 import type { DB } from "../db/DB.js";
 import type { Scheduler } from "../scheduler/Scheduler.js";
 import type { Cache } from "../cache/Cache.js";
@@ -47,6 +48,7 @@ export class Api extends Service {
     });
 
     this.ex.use(cors);
+    this.ex.use(helmet());
     this.ex.use(log);
     this.ex.use("/scraper", scraperRouter);
     this.ex.use("/run", runRouter);
