@@ -20,7 +20,7 @@ const accessRequest = rateLimit({
 
 const dev = rateLimit({
   ...sharedConfig,
-  windowMs: Infinity,
+  windowMs: 1 * 60 * 1000, // 1 minute
   max: Infinity,
 });
 
