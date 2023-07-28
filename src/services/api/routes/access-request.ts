@@ -23,6 +23,7 @@ accessRequestRouter.post("/", accessRequestLimiter, async (req, res) => {
   const count = parseInt(otherwise(cookies?.accessRequestCount, 0));
 
   res.cookie("accessRequestCount", count + 1, {
+    sameSite: "strict",
     maxAge: 1000 * 60 * 30, // 30 minutes
   });
 
