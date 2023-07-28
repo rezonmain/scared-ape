@@ -55,7 +55,7 @@ accessRequestRouter.post("/", accessRequestLimiter, async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
-  return res.sendStatus(201);
+  return res.status(201).json({ email });
 });
 
 accessRequestRouter.use(authenticated);
