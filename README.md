@@ -1,11 +1,12 @@
 # Scared-Ape
 
 A web scraper to make my life easier (and to practice SQL)
+Visit the website at https://apeq.app, and checkout [the front end's repository](https://github.com/rezonmain/scared-ape-web)
 
-Hey, the following steps are for me to remember how to mount the app
+Hey, the following steps are for me to remember how to run the app in the cloud
 they are not a guide 😁
 
-### HOW TO MOUNT APP TO AWS:
+### HOW TO RUN APP IN AWS:
 
 1. You NEED a domain (this is for setting up ssl)
 2. In the aws console make sure you have selected **us-west2** as your region at the top right of the navbar
@@ -62,8 +63,9 @@ they are not a guide 😁
    5. Enter the env values (should be in the project of your local machine or saved in the password manager)
    6. Start the docker deamon `sudo systemctl start docker`
    7. Build the docker image `sudo docker build . -t sape`
-   8. After it finishes run the docker image `sudo docker run -p 80:7363 -e NODE_ENV=xxx sape` its better if you run the container in a tmux window
-   9. Acceptable values for `NODE_ENV` are `prod | stage | dev`
+   8. Create the database `touch scared-ape.sqlite`
+   9. After it finishes run the docker image `sudo docker run -e NODE_ENV=prod -p 80:7363 --mount type=bind,source=/home/ec2-user/scared-ape/scared-ape.sqlite,target=/app/scared-ape.sqlite sape` its better if you run the container in a tmux window
+   10. Acceptable values for `NODE_ENV` are `prod | stage | dev`
 
 ## TROUBLESHOOTING
 
