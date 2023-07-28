@@ -1,10 +1,5 @@
 import { Router } from "express";
-import {
-  isNothing,
-  otherwise,
-  parseCookie,
-  unsafeCoerce,
-} from "../../../utils/ez.js";
+import { isNothing, otherwise, unsafeCoerce } from "../../../utils/ez.js";
 import { authenticated, asPyro } from "../auth.middleware.js";
 import { accessRequestLimiter } from "../limiter.middleware.js";
 import { z } from "zod";
@@ -19,20 +14,6 @@ const accessRequestRouter = Router();
  * @query email
  */
 accessRequestRouter.post("/", accessRequestLimiter, async (req, res) => {
-  const cookies = parseCookie(req.headers.cookie);
-  const count = parseInt(otherwise(cookies?.accessRequestCount, 0));
-
-  res.cookie("accessRequestCount", count + 1, {
-    sameSite: "strict",
-    maxAge: 1000 * 60 * 30, // 30 minutes
-  });
-
-  if (count >= 2) {
-    return res.status(429).json({
-      error: ErrorHelper.message("general_002"),
-    });
-  }
-
   const unsafeEmail = req.query.email;
   let email: string;
   try {
@@ -56,6 +37,12 @@ accessRequestRouter.post("/", accessRequestLimiter, async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
+
+  res.cookie("lastAccessRequest", email, {
+    sameSite: "strict",
+    maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+  });
+
   return res.status(201).json({ email });
 });
 
