@@ -16,7 +16,7 @@ import { HomeDto } from "./dto/api.dto.js";
 import { log } from "./log.middleware.js";
 import { cors } from "./cors.middleware.js";
 import { generalLimiter } from "./limiter.middleware.js";
-import { accessRequestRouter } from "./routes/access_request.js";
+import { accessRequestRouter } from "./routes/access-request.js";
 
 export class Api extends Service {
   private ex: express.Express;
