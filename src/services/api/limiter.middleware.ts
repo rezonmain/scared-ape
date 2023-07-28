@@ -6,16 +6,26 @@ const sharedConfig: Partial<Options> = {
   standardHeaders: true,
   message: { error: "Too many requests" },
 };
-const generalLimiter = rateLimit({
+const general = rateLimit({
   ...sharedConfig,
-  windowMs: 30 * 60 * 1000, // 1 hour window
+  windowMs: 30 * 60 * 1000, // 30 hour window
   max: 100,
 });
 
-const accessRequestLimiter = rateLimit({
+const accessRequest = rateLimit({
   ...sharedConfig,
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 2,
 });
+
+const dev = rateLimit({
+  ...sharedConfig,
+  windowMs: Infinity,
+  max: Infinity,
+});
+
+const generalLimiter = process.env.NODE_ENV === "dev" ? dev : general;
+const accessRequestLimiter =
+  process.env.NODE_ENV === "dev" ? dev : accessRequest;
 
 export { generalLimiter, accessRequestLimiter };
