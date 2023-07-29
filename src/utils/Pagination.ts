@@ -11,7 +11,8 @@ export type Paginated<T> = {
 interface IPagination {
   currentPage: number;
   nextPage: number | null;
-  previouPage: number | null;
+  previousPage: number | null;
+  pageSize: number;
   totalPages: number;
   totalRecords: number;
 }
@@ -27,7 +28,8 @@ export class Pagination implements IPagination {
     return {
       currentPage: this.currentPage,
       nextPage: this.nextPage,
-      previouPage: this.previouPage,
+      previousPage: this.previousPage,
+      pageSize: this.limit,
       totalPages: this.totalPages,
       totalRecords: this.totalRows,
     };
@@ -42,7 +44,7 @@ export class Pagination implements IPagination {
     return next > this.totalPages ? null : next;
   }
 
-  get previouPage(): number | null {
+  get previousPage(): number | null {
     const prev = this.currentPage - 1;
     return prev < 1 ? null : prev;
   }
@@ -53,6 +55,10 @@ export class Pagination implements IPagination {
 
   get totalRecords(): number {
     return this.totalRows;
+  }
+
+  get pageSize(): number {
+    return this.limit;
   }
 
   static defaultLimit = 10;
