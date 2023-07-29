@@ -501,11 +501,7 @@ export class SQLiteDB extends DB {
         .all(opt.limit, opt.offset) as AccessRequest[];
 
       Logger.log(
-        `✅ [💾SQLite ${
-          this.name
-        }][pgGetAccessRequests()] Query -> ${query} with ${Object.values(
-          opt
-        ).join(",")}`
+        `✅ [💾SQLite ${this.name}][pgGetAccessRequests()] Query -> ${query} with ${opt.limit}, ${opt.offset}`
       );
 
       query = "SELECT COUNT(*) FROM access_request";
