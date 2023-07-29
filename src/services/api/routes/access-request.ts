@@ -55,11 +55,13 @@ accessRequestRouter.use(authenticated);
  * @query page - The page of accessRequests to return
  */
 accessRequestRouter.get("/", asPyro, async (req, res) => {
-  const limit = otherwise(req.query.limit, Pagination.defaultLimit);
-  const page = otherwise(req.query.page, 0);
+  const limit = unsafeCoerce<number>(
+    otherwise(req.query.limit, Pagination.defaultLimit)
+  );
+  const page = unsafeCoerce<number>(otherwise(req.query.page, 1));
   const { pagination, list } = await req.ctx.db.pgGetAccessRequests({
-    limit: unsafeCoerce<number>(limit),
-    offset: unsafeCoerce<number>(page) * unsafeCoerce<number>(limit),
+    limit,
+    offset: page * limit - limit,
   });
   if (isNothing(list)) {
     return res
